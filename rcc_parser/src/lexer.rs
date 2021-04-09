@@ -25,6 +25,8 @@ impl<'a> Lexer<'a> {
         self.src.len() == 0
     }
 
+    /// 引数として与えられた文字をパースできる場合にtrueを返し、文字列を読み進める。
+    /// そうでない場合はfalseを返す。
     pub fn expect_char(&mut self, expect: char) -> bool {
         let result: IResult<&str, char> = char(expect)(self.src);
 
@@ -40,6 +42,8 @@ impl<'a> Lexer<'a> {
         }
     }
 
+
+    /// 数をパースできる場合にその数字を返し、文字列を読み進める。
     pub fn read_num(&mut self) -> Option<u32> {
         let from_str = |s: &str| u32::from_str_radix(s, 10);
         let result: IResult<&str, u32> = map_res(digit1, from_str)(self.src);
