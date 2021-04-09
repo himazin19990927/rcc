@@ -20,6 +20,11 @@ impl<'a> Lexer<'a> {
         Lexer { src: src }
     }
 
+    /// 字句解析が終了している場合にtrueを返す。
+    pub fn is_end(&self) -> bool {
+        self.src.len() == 0
+    }
+
     pub fn expect_char(&mut self, expect: char) -> bool {
         let result: IResult<&str, char> = char(expect)(self.src);
 
@@ -69,5 +74,14 @@ mod tests {
         assert_eq!(false, lexer.expect_char('a'));
         assert_eq!(true, lexer.expect_char('b'));
         assert_eq!(false, lexer.expect_char('b'));
+    }
+
+    #[test]
+    fn test_is_end() {
+        let mut lexer = Lexer::new("a");
+
+        assert_eq!(false, lexer.is_end());
+        let _ = lexer.expect_char('a');
+        assert_eq!(true, lexer.is_end());
     }
 }
