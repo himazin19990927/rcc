@@ -3,3 +3,10 @@
 [[package]]
 name = "rcc"
 version = "0.1.0"
+dependencies = [
+ "rcc_parser",
+]
+
+[[package]]
+name = "rcc_parser"
+version = "0.1.0"
