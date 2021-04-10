@@ -1,4 +1,4 @@
-use crate::ast::{BinOp, Expr};
+use crate::ast::{BinOp, Expr, UnOp};
 use crate::lexer::{Lexer, Token, TokenKind};
 
 #[derive(Debug)]
@@ -67,7 +67,7 @@ impl<'a> Parser<'a> {
     }
 
     pub fn mul(&mut self) -> Expr {
-        let left = self.primary();
+        let left = self.unary();
 
         if self.consume(TokenKind::Star) {
             let right = self.mul();
@@ -82,6 +82,19 @@ impl<'a> Parser<'a> {
         return left;
     }
 
+    pub fn unary(&mut self) -> Expr {
+        if self.consume(TokenKind::Plus) {
+            return self.primary();
+        }
+
+        if self.consume(TokenKind::Minus) {
+            let right = self.primary();
+            return Expr::Unary(UnOp::Neg, Box::new(right));
+        }
+
+        return self.primary();
+    }
+
     pub fn primary(&mut self) -> Expr {
         let num = self.expect_number();
 
@@ -91,7 +104,7 @@ impl<'a> Parser<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::{BinOp, Expr};
+    use crate::ast::{BinOp, Expr, UnOp};
     use crate::lexer::Lexer;
     use crate::parser::Parser;
 
@@ -103,41 +116,58 @@ mod tests {
     }
 
     #[test]
+    fn parse_unary() {
+        assert_eq!(
+            Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))),
+            Parser::new(Lexer::new("-1")).expr(),
+        );
+
+        assert_eq!(
+            Expr::Binary(
+                BinOp::Add,
+                Box::new(Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1)))),
+                Box::new(Expr::Integer(2)),
+            ),
+            Parser::new(Lexer::new("-1+2")).expr(),
+        );
+    }
+
+    #[test]
     fn parse_binary() {
         assert_eq!(
             Expr::Binary(
                 BinOp::Add,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(1))
+                Box::new(Expr::Integer(2))
             ),
-            Parser::new(Lexer::new("1+1")).expr(),
+            Parser::new(Lexer::new("1+2")).expr(),
         );
 
         assert_eq!(
             Expr::Binary(
                 BinOp::Sub,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(1))
+                Box::new(Expr::Integer(2))
             ),
-            Parser::new(Lexer::new("1-1")).expr(),
+            Parser::new(Lexer::new("1-2")).expr(),
         );
 
         assert_eq!(
             Expr::Binary(
                 BinOp::Mul,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(1))
+                Box::new(Expr::Integer(2))
             ),
-            Parser::new(Lexer::new("1*1")).expr(),
+            Parser::new(Lexer::new("1*2")).expr(),
         );
 
         assert_eq!(
             Expr::Binary(
                 BinOp::Div,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(1))
+                Box::new(Expr::Integer(2))
             ),
-            Parser::new(Lexer::new("1/1")).expr(),
+            Parser::new(Lexer::new("1/2")).expr(),
         );
 
         assert_eq!(
