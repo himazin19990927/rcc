@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum BinOp {
     Add,
     Sub,
@@ -6,13 +6,14 @@ pub enum BinOp {
     Div,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum UnOp {
     Neg,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Expr {
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
+    Integer(u32),
 }
