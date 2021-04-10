@@ -1,5 +1,6 @@
 use crate::ast::{BinOp, Expr, UnOp};
-use crate::lexer::{Lexer, Token, TokenKind};
+use crate::lexer::Lexer;
+use crate::token::{Token, TokenKind};
 
 #[derive(Debug)]
 pub struct Parser<'a> {
