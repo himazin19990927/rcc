@@ -128,7 +128,7 @@ mod tests {
     }
 
     #[test]
-    fn tokenze_num() {
+    fn tokenize_num() {
         lexer_test(
             "100",
             &vec![
