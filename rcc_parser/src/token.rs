@@ -5,6 +5,8 @@ pub enum TokenKind {
     Minus,
     Star,
     Slash,
+    OpenParen,
+    CloseParen,
     EOF,
     Unknown,
 }

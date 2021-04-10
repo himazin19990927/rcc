@@ -32,6 +32,8 @@ impl<'a> Lexer<'a> {
             '-' => Token::new(TokenKind::Minus, self.ch),
             '*' => Token::new(TokenKind::Star, self.ch),
             '/' => Token::new(TokenKind::Slash, self.ch),
+            '(' => Token::new(TokenKind::OpenParen, self.ch),
+            ')' => Token::new(TokenKind::CloseParen, self.ch),
             c => {
                 if c.is_digit(10) {
                     return Token::new(TokenKind::Num, self.read_number().unwrap());
@@ -141,6 +143,35 @@ mod tests {
                 Token::new(TokenKind::Num, "1"),
                 Token::new(TokenKind::Plus, '+'),
                 Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+    }
+
+    #[test]
+    fn tokenize_paren() {
+        lexer_test(
+            "(",
+            &vec![
+                Token::new(TokenKind::OpenParen, '('),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+        lexer_test(
+            ")",
+            &vec![
+                Token::new(TokenKind::CloseParen, ')'),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+        lexer_test(
+            "(100+1)",
+            &vec![
+                Token::new(TokenKind::OpenParen, '('),
+                Token::new(TokenKind::Num, "100"),
+                Token::new(TokenKind::Plus, '+'),
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::CloseParen, ')'),
                 Token::new(TokenKind::EOF, "\0"),
             ],
         );
