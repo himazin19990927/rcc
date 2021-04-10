@@ -1,14 +1,29 @@
-use std::{str::Chars, u32};
+use std::str::Chars;
 
-#[derive(Debug, PartialEq)]
-pub enum Token {
-    Num(u32),
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum TokenKind {
+    Num,
     Plus,
     Minus,
     Star,
     Slash,
     EOF,
     Unknown,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Token {
+    pub kind: TokenKind,
+    pub literal: String,
+}
+
+impl Token {
+    pub fn new<T: Into<String>>(kind: TokenKind, literal: T) -> Token {
+        Token {
+            kind: kind,
+            literal: literal.into(),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -34,17 +49,17 @@ impl<'a> Lexer<'a> {
         self.skip_whitespace();
 
         if self.terminated {
-            return Token::EOF;
+            return Token::new(TokenKind::EOF, self.ch);
         }
 
         let token = match self.ch {
-            '+' => Token::Plus,
-            '-' => Token::Minus,
-            '*' => Token::Star,
-            '/' => Token::Slash,
+            '+' => Token::new(TokenKind::Plus, self.ch),
+            '-' => Token::new(TokenKind::Minus, self.ch),
+            '*' => Token::new(TokenKind::Star, self.ch),
+            '/' => Token::new(TokenKind::Slash, self.ch),
             c => {
                 if c.is_digit(10) {
-                    return Token::Num(self.read_number().unwrap());
+                    return Token::new(TokenKind::Num, self.read_number().unwrap());
                 }
 
                 unimplemented!();
@@ -73,7 +88,7 @@ impl<'a> Lexer<'a> {
         self.ch
     }
 
-    pub fn read_number(&mut self) -> Option<u32> {
+    pub fn read_number(&mut self) -> Option<String> {
         if self.terminated || !self.ch.is_digit(10) {
             return None;
         }
@@ -88,10 +103,7 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        match num_str.parse() {
-            Ok(num) => Some(num),
-            Err(_) => None,
-        }
+        return Some(num_str);
     }
 
     pub fn peek_char(&self) -> char {
@@ -112,23 +124,27 @@ impl<'a> Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Lexer, Token};
+    use super::{Lexer, Token, TokenKind};
 
     #[test]
     fn read_num() {
-        assert_eq!(Some(1), Lexer::new("01").read_number());
-        assert_eq!(Some(100), Lexer::new("100").read_number());
-        assert_eq!(Some(1), Lexer::new("1+1").read_number());
+        assert_eq!(Some("01".to_string()), Lexer::new("01").read_number());
+        assert_eq!(Some("100".to_string()), Lexer::new("100").read_number());
+        assert_eq!(Some("1".to_string()), Lexer::new("1+1").read_number());
         assert_eq!(None, Lexer::new("a1").read_number());
     }
 
     fn lexer_test(src: &str, expected: &Vec<Token>) {
         let mut lexer = Lexer::new(src);
 
-        let mut tokens = Vec::new();
-        while tokens.last() != Some(&Token::EOF) {
-            println!("{:?}", lexer);
+        let mut tokens: Vec<Token> = Vec::new();
+
+        loop {
             tokens.push(lexer.next_token());
+
+            if tokens.last().unwrap().kind == TokenKind::EOF {
+                break;
+            }
         }
 
         assert_eq!(expected, &tokens);
@@ -136,32 +152,22 @@ mod tests {
 
     #[test]
     fn tokenze_num() {
-        lexer_test("100", &vec![Token::Num(100), Token::EOF]);
+        lexer_test(
+            "100",
+            &vec![
+                Token::new(TokenKind::Num, "100"),
+                Token::new(TokenKind::EOF, '\0'),
+            ],
+        );
 
         lexer_test(
             "1+2",
-            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
-        );
-        lexer_test(
-            "1-2",
-            &vec![Token::Num(1), Token::Minus, Token::Num(2), Token::EOF],
-        );
-        lexer_test(
-            "1*2",
-            &vec![Token::Num(1), Token::Star, Token::Num(2), Token::EOF],
-        );
-        lexer_test(
-            "1/2",
-            &vec![Token::Num(1), Token::Slash, Token::Num(2), Token::EOF],
-        );
-
-        lexer_test(
-            " 1 + 2",
-            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
-        );
-        lexer_test(
-            " 1 + 2 ",
-            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
+            &vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Plus, '+'),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
         );
     }
 }
