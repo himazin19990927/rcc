@@ -1,9 +1,4 @@
-use nom::{
-    // bytes::complete::tag,
-    character::complete::{char, digit1},
-    combinator::map_res,
-    IResult,
-};
+use std::{str::Chars, u32};
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
@@ -12,79 +7,106 @@ pub enum Token {
     Minus,
     Star,
     Slash,
+    EOF,
+    Unknown,
 }
 
+#[derive(Debug)]
 pub struct Lexer<'a> {
-    src: &'a str,
+    src: Chars<'a>,
+    terminated: bool,
+    ch: char,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(src: &str) -> Lexer {
-        Lexer { src: src }
+        let mut lexer = Lexer {
+            src: src.chars(),
+            terminated: false,
+            ch: ' ',
+        };
+
+        lexer.read_char();
+        lexer
     }
 
-    /// 字句解析が終了している場合にtrueを返す。
-    pub fn is_end(&self) -> bool {
-        self.src.len() == 0
-    }
+    pub fn next_token(&mut self) -> Token {
+        self.skip_whitespace();
 
-    /// 引数として与えられた文字をパースできる場合にtrueを返し、文字列を読み進める。
-    /// そうでない場合はfalseを返す。
-    pub fn expect_char(&mut self, expect: char) -> bool {
-        let result: IResult<&str, char> = char(expect)(self.src);
+        if self.terminated {
+            return Token::EOF;
+        }
 
-        match result {
-            Ok((remain, _)) => {
-                self.src = remain;
-                return true;
+        let token = match self.ch {
+            '+' => Token::Plus,
+            '-' => Token::Minus,
+            '*' => Token::Star,
+            '/' => Token::Slash,
+            c => {
+                if c.is_digit(10) {
+                    return Token::Num(self.read_number().unwrap());
+                }
+
+                unimplemented!();
             }
+        };
 
-            Err(_) => {
-                return false;
+        self.read_char();
+        return token;
+    }
+
+    pub fn read_char(&mut self) -> char {
+        if self.terminated {
+            return self.ch;
+        }
+
+        match self.src.next() {
+            Some(c) => {
+                self.ch = c;
+            }
+            None => {
+                self.ch = '\0';
+                self.terminated = true;
             }
         }
+
+        self.ch
     }
 
-    /// 数をパースできる場合にその数字を返し、文字列を読み進める。
-    pub fn read_num(&mut self) -> Option<u32> {
-        let from_str = |s: &str| u32::from_str_radix(s, 10);
-        let result: IResult<&str, u32> = map_res(digit1, from_str)(self.src);
-
-        match result {
-            Ok((remain, result)) => {
-                self.src = remain;
-                return Some(result);
-            }
-            Err(_) => {
-                return None;
-            }
-        }
-    }
-}
-
-impl<'a> Iterator for Lexer<'a> {
-    type Item = Token;
-
-    fn next(&mut self) -> Option<Token> {
-        if self.is_end() {
+    pub fn read_number(&mut self) -> Option<u32> {
+        if self.terminated || !self.ch.is_digit(10) {
             return None;
         }
 
-        if let Some(num) = self.read_num() {
-            return Some(Token::Num(num));
+        let mut num_str = String::from(self.ch);
+        loop {
+            let c = self.read_char();
+            if c.is_digit(10) {
+                num_str.push(c);
+            } else {
+                break;
+            }
         }
 
-        if self.expect_char('+') {
-            return Some(Token::Plus);
-        } else if self.expect_char('-') {
-            return Some(Token::Minus);
-        } else if self.expect_char('*') {
-            return Some(Token::Star);
-        } else if self.expect_char('/') {
-            return Some(Token::Slash);
+        match num_str.parse() {
+            Ok(num) => Some(num),
+            Err(_) => None,
         }
+    }
 
-        return None;
+    pub fn peek_char(&self) -> char {
+        let mut chars = self.src.clone();
+
+        match chars.next() {
+            Some(c) => c,
+            None => '\0',
+        }
+    }
+
+    pub fn skip_whitespace(&mut self) {
+        while !self.terminated && self.ch.is_whitespace() {
+            self.read_char();
+        }
     }
 }
 
@@ -93,42 +115,53 @@ mod tests {
     use super::{Lexer, Token};
 
     #[test]
-    fn test_read_num() {
-        let mut lexer = Lexer::new("123abc");
-        assert_eq!(Some(123), lexer.read_num());
-        assert_eq!(None, lexer.read_num());
+    fn read_num() {
+        assert_eq!(Some(1), Lexer::new("01").read_number());
+        assert_eq!(Some(100), Lexer::new("100").read_number());
+        assert_eq!(Some(1), Lexer::new("1+1").read_number());
+        assert_eq!(None, Lexer::new("a1").read_number());
+    }
+
+    fn lexer_test(src: &str, expected: &Vec<Token>) {
+        let mut lexer = Lexer::new(src);
+
+        let mut tokens = Vec::new();
+        while tokens.last() != Some(&Token::EOF) {
+            println!("{:?}", lexer);
+            tokens.push(lexer.next_token());
+        }
+
+        assert_eq!(expected, &tokens);
     }
 
     #[test]
-    fn test_expect_char() {
-        let mut lexer = Lexer::new("ab");
-        assert_eq!(true, lexer.expect_char('a'));
-        assert_eq!(false, lexer.expect_char('a'));
-        assert_eq!(true, lexer.expect_char('b'));
-        assert_eq!(false, lexer.expect_char('b'));
-    }
+    fn tokenze_num() {
+        lexer_test("100", &vec![Token::Num(100), Token::EOF]);
 
-    #[test]
-    fn test_is_end() {
-        let mut lexer = Lexer::new("a");
+        lexer_test(
+            "1+2",
+            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
+        );
+        lexer_test(
+            "1-2",
+            &vec![Token::Num(1), Token::Minus, Token::Num(2), Token::EOF],
+        );
+        lexer_test(
+            "1*2",
+            &vec![Token::Num(1), Token::Star, Token::Num(2), Token::EOF],
+        );
+        lexer_test(
+            "1/2",
+            &vec![Token::Num(1), Token::Slash, Token::Num(2), Token::EOF],
+        );
 
-        assert_eq!(false, lexer.is_end());
-        let _ = lexer.expect_char('a');
-        assert_eq!(true, lexer.is_end());
-    }
-
-    fn assert_eq_lexer(src: &str, expected: &Vec<Token>) {
-        let result: Vec<_> = Lexer::new(src).into_iter().collect();
-        assert_eq!(*expected, result);
-    }
-
-    #[test]
-    fn test_lexer() {
-        assert_eq_lexer("1+2", &vec![Token::Num(1), Token::Plus, Token::Num(2)]);
-        assert_eq_lexer("1-2", &vec![Token::Num(1), Token::Minus, Token::Num(2)]);
-        assert_eq_lexer("1*2", &vec![Token::Num(1), Token::Star, Token::Num(2)]);
-        assert_eq_lexer("1/2", &vec![Token::Num(1), Token::Slash, Token::Num(2)]);
-
-        assert_eq_lexer("1*2+3", &vec![Token::Num(1), Token::Star, Token::Num(2), Token::Plus, Token::Num(3)]);
+        lexer_test(
+            " 1 + 2",
+            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
+        );
+        lexer_test(
+            " 1 + 2 ",
+            &vec![Token::Num(1), Token::Plus, Token::Num(2), Token::EOF],
+        );
     }
 }
