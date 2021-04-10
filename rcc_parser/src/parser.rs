@@ -130,6 +130,15 @@ mod tests {
             ),
             Parser::new(Lexer::new("-1+2")).expr(),
         );
+
+        assert_eq!(
+            Expr::Binary(
+                BinOp::Mul,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(2)))),
+            ),
+            Parser::new(Lexer::new("1 * -2")).expr(),
+        );
     }
 
     #[test]
