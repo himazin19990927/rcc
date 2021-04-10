@@ -108,78 +108,80 @@ mod tests {
     use crate::lexer::Lexer;
     use crate::parser::Parser;
 
+    fn test_expr(src: &str, expect: Expr) {
+        assert_eq!(expect, Parser::new(Lexer::new(src)).expr());
+    }
+
     #[test]
     fn parse_num() {
-        assert_eq!(Expr::Integer(0), Parser::new(Lexer::new("0")).expr());
-        assert_eq!(Expr::Integer(10), Parser::new(Lexer::new("10")).expr());
-        assert_eq!(Expr::Integer(1), Parser::new(Lexer::new("01")).expr());
+        test_expr("0", Expr::Integer(0));
+        test_expr("10", Expr::Integer(10));
+        test_expr("01", Expr::Integer(1));
     }
 
     #[test]
     fn parse_unary() {
-        assert_eq!(
-            Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))),
-            Parser::new(Lexer::new("-1")).expr(),
-        );
+        test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))));
 
-        assert_eq!(
+        test_expr(
+            "-1+2",
             Expr::Binary(
                 BinOp::Add,
                 Box::new(Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1)))),
                 Box::new(Expr::Integer(2)),
             ),
-            Parser::new(Lexer::new("-1+2")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1*-2",
             Expr::Binary(
                 BinOp::Mul,
                 Box::new(Expr::Integer(1)),
                 Box::new(Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(2)))),
             ),
-            Parser::new(Lexer::new("1 * -2")).expr(),
         );
     }
 
     #[test]
     fn parse_binary() {
-        assert_eq!(
+        test_expr(
+            "1+2",
             Expr::Binary(
                 BinOp::Add,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2))
+                Box::new(Expr::Integer(2)),
             ),
-            Parser::new(Lexer::new("1+2")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1-2",
             Expr::Binary(
                 BinOp::Sub,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2))
+                Box::new(Expr::Integer(2)),
             ),
-            Parser::new(Lexer::new("1-2")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1*2",
             Expr::Binary(
                 BinOp::Mul,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2))
+                Box::new(Expr::Integer(2)),
             ),
-            Parser::new(Lexer::new("1*2")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1/2",
             Expr::Binary(
                 BinOp::Div,
                 Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2))
+                Box::new(Expr::Integer(2)),
             ),
-            Parser::new(Lexer::new("1/2")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1+2+3",
             Expr::Binary(
                 BinOp::Add,
                 Box::new(Expr::Integer(1)),
@@ -187,12 +189,12 @@ mod tests {
                     BinOp::Add,
                     Box::new(Expr::Integer(2)),
                     Box::new(Expr::Integer(3)),
-                ))
+                )),
             ),
-            Parser::new(Lexer::new("1+2+3")).expr(),
         );
 
-        assert_eq!(
+        test_expr(
+            "1*2+3",
             Expr::Binary(
                 BinOp::Add,
                 Box::new(Expr::Binary(
@@ -202,7 +204,6 @@ mod tests {
                 )),
                 Box::new(Expr::Integer(3)),
             ),
-            Parser::new(Lexer::new("1*2+3")).expr(),
         );
     }
 }
