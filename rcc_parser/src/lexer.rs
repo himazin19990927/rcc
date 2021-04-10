@@ -111,7 +111,7 @@ mod tests {
         assert_eq!(None, Lexer::new("a1").read_number());
     }
 
-    fn lexer_test(src: &str, expected: &Vec<Token>) {
+    fn test_lexer(src: &str, expected: Vec<Token>) {
         let mut lexer = Lexer::new(src);
 
         let mut tokens: Vec<Token> = Vec::new();
@@ -124,22 +124,22 @@ mod tests {
             }
         }
 
-        assert_eq!(expected, &tokens);
+        assert_eq!(expected, tokens);
     }
 
     #[test]
     fn tokenize_num() {
-        lexer_test(
+        test_lexer(
             "100",
-            &vec![
+            vec![
                 Token::new(TokenKind::Num, "100"),
                 Token::new(TokenKind::EOF, '\0'),
             ],
         );
 
-        lexer_test(
+        test_lexer(
             "1+2",
-            &vec![
+            vec![
                 Token::new(TokenKind::Num, "1"),
                 Token::new(TokenKind::Plus, '+'),
                 Token::new(TokenKind::Num, "2"),
@@ -150,23 +150,23 @@ mod tests {
 
     #[test]
     fn tokenize_paren() {
-        lexer_test(
+        test_lexer(
             "(",
-            &vec![
+            vec![
                 Token::new(TokenKind::OpenParen, '('),
                 Token::new(TokenKind::EOF, "\0"),
             ],
         );
-        lexer_test(
+        test_lexer(
             ")",
-            &vec![
+            vec![
                 Token::new(TokenKind::CloseParen, ')'),
                 Token::new(TokenKind::EOF, "\0"),
             ],
         );
-        lexer_test(
+        test_lexer(
             "(100+1)",
-            &vec![
+            vec![
                 Token::new(TokenKind::OpenParen, '('),
                 Token::new(TokenKind::Num, "100"),
                 Token::new(TokenKind::Plus, '+'),
