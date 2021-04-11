@@ -61,12 +61,12 @@ name = "rcc"
 version = "0.1.0"
 dependencies = [
  "clap",
- "rcc_codegen",
+ "rcc_compiler",
  "rcc_parser",
 ]
 
 [[package]]
-name = "rcc_codegen"
+name = "rcc_compiler"
 version = "0.1.0"
 
 [[package]]

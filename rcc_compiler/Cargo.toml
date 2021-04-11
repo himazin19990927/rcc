@@ -1,5 +1,5 @@
 [package]
-name = "rcc_codegen"
+name = "rcc_compiler"
 version = "0.1.0"
 authors = ["Taiki Harada <haradataiki19990927@gmail.com>"]
 edition = "2018"

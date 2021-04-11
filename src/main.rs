@@ -1,4 +1,4 @@
-use rcc_codegen::asm::{Builder, Instruction, Reg};
+use rcc_compiler::asm::{Builder, Instruction, Reg};
 use std::fs;
 use std::io::{BufWriter, Write};
 use std::process::Command;
