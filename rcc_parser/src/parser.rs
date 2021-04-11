@@ -97,6 +97,12 @@ impl<'a> Parser<'a> {
     }
 
     pub fn primary(&mut self) -> Expr {
+        if self.consume(TokenKind::OpenParen) {
+            let expr = self.expr();
+            self.expect(TokenKind::CloseParen);
+            return expr;
+        }
+
         let num = self.expect_number();
 
         Expr::Integer(num)
@@ -123,7 +129,6 @@ mod tests {
     #[test]
     fn parse_unary() {
         test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))));
-
         test_expr(
             "-1+2",
             Expr::Binary(
@@ -132,7 +137,6 @@ mod tests {
                 Box::new(Expr::Integer(2)),
             ),
         );
-
         test_expr(
             "1*-2",
             Expr::Binary(
@@ -153,7 +157,6 @@ mod tests {
                 Box::new(Expr::Integer(2)),
             ),
         );
-
         test_expr(
             "1-2",
             Expr::Binary(
@@ -162,7 +165,6 @@ mod tests {
                 Box::new(Expr::Integer(2)),
             ),
         );
-
         test_expr(
             "1*2",
             Expr::Binary(
@@ -171,7 +173,6 @@ mod tests {
                 Box::new(Expr::Integer(2)),
             ),
         );
-
         test_expr(
             "1/2",
             Expr::Binary(
@@ -180,7 +181,6 @@ mod tests {
                 Box::new(Expr::Integer(2)),
             ),
         );
-
         test_expr(
             "1+2+3",
             Expr::Binary(
@@ -193,7 +193,6 @@ mod tests {
                 )),
             ),
         );
-
         test_expr(
             "1*2+3",
             Expr::Binary(
@@ -204,6 +203,51 @@ mod tests {
                     Box::new(Expr::Integer(2)),
                 )),
                 Box::new(Expr::Integer(3)),
+            ),
+        );
+    }
+
+    #[test]
+    fn parse_paren() {
+        test_expr("(1)", Expr::Integer(1));
+        test_expr(
+            "(1+2)",
+            Expr::Binary(
+                BinOp::Add,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1*(2+3)",
+            Expr::Binary(
+                BinOp::Mul,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Binary(
+                    BinOp::Add,
+                    Box::new(Expr::Integer(2)),
+                    Box::new(Expr::Integer(3)),
+                )),
+            ),
+        );
+        test_expr(
+            "(1+2)*(3/(4+5))",
+            Expr::Binary(
+                BinOp::Mul,
+                Box::new(Expr::Binary(
+                    BinOp::Add,
+                    Box::new(Expr::Integer(1)),
+                    Box::new(Expr::Integer(2)),
+                )),
+                Box::new(Expr::Binary(
+                    BinOp::Div,
+                    Box::new(Expr::Integer(3)),
+                    Box::new(Expr::Binary(
+                        BinOp::Add,
+                        Box::new(Expr::Integer(4)),
+                        Box::new(Expr::Integer(5)),
+                    )),
+                )),
             ),
         );
     }
