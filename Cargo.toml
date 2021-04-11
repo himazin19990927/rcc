@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 rcc_parser = {path = "rcc_parser"}
 rcc_codegen = {path = "rcc_codegen"}
+
+clap = "2.33.3"

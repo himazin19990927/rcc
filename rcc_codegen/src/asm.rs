@@ -1,7 +1,5 @@
 use std::fmt;
 
-use fmt::write;
-
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Reg {
     RAX,
@@ -48,6 +46,7 @@ impl fmt::Display for Reg {
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Instruction {
     Mov(Reg, Reg),
+    MovImm(Reg, u32),
     MovLd(Reg, Reg),
     MovSt(Reg, Reg),
     Push(Reg),
@@ -69,6 +68,7 @@ impl fmt::Display for Instruction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Instruction::Mov(dst, src) => write!(f, "mov {}, {}", dst, src),
+            Instruction::MovImm(dst, imm) => write!(f, "mov {}, {}", dst, imm),
             Instruction::MovLd(dst, src) => write!(f, "mov {}, [{}]", dst, src),
             Instruction::MovSt(dst, src) => write!(f, "mov [{}], {}", dst, src),
             Instruction::Push(src) => write!(f, "push {}", src),
@@ -85,5 +85,54 @@ impl fmt::Display for Instruction {
             Instruction::Cqo => write!(f, "cqo"),
             Instruction::Ret => write!(f, "ret"),
         }
+    }
+}
+
+pub struct Asm {
+    items: Vec<AsmItem>,
+}
+
+impl fmt::Display for Asm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, ".intel_syntax noprefix")?;
+        writeln!(f, ".globl main")?;
+
+        for item in &self.items {
+            match &item {
+                AsmItem::Label(label) => writeln!(f, "{}:", label)?,
+                AsmItem::Instr(instr) => writeln!(f, "  {}", instr)?,
+            }
+        }
+
+        Ok(())
+    }
+}
+
+enum AsmItem {
+    Label(String),
+    Instr(Instruction),
+}
+
+pub struct Builder {
+    asm: Asm,
+}
+
+impl Builder {
+    pub fn new() -> Builder {
+        Builder {
+            asm: Asm { items: Vec::new() },
+        }
+    }
+
+    pub fn instr(&mut self, instr: Instruction) {
+        self.asm.items.push(AsmItem::Instr(instr));
+    }
+
+    pub fn label<T: std::fmt::Display>(&mut self, label: T) {
+        self.asm.items.push(AsmItem::Label(label.to_string()));
+    }
+
+    pub fn build(self) -> Asm {
+        self.asm
     }
 }
