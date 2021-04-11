@@ -44,7 +44,7 @@ impl fmt::Display for Reg {
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-pub enum Instruction {
+pub enum Instr {
     Mov(Reg, Reg),
     MovImm(Reg, u32),
     MovLd(Reg, Reg),
@@ -64,26 +64,26 @@ pub enum Instruction {
     Ret,
 }
 
-impl fmt::Display for Instruction {
+impl fmt::Display for Instr {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Instruction::Mov(dst, src) => write!(f, "mov {}, {}", dst, src),
-            Instruction::MovImm(dst, imm) => write!(f, "mov {}, {}", dst, imm),
-            Instruction::MovLd(dst, src) => write!(f, "mov {}, [{}]", dst, src),
-            Instruction::MovSt(dst, src) => write!(f, "mov [{}], {}", dst, src),
-            Instruction::Push(src) => write!(f, "push {}", src),
-            Instruction::PushImm(imm) => write!(f, "push {}", imm),
-            Instruction::Pop(dst) => write!(f, "pop {}", dst),
+            Instr::Mov(dst, src) => write!(f, "mov {}, {}", dst, src),
+            Instr::MovImm(dst, imm) => write!(f, "mov {}, {}", dst, imm),
+            Instr::MovLd(dst, src) => write!(f, "mov {}, [{}]", dst, src),
+            Instr::MovSt(dst, src) => write!(f, "mov [{}], {}", dst, src),
+            Instr::Push(src) => write!(f, "push {}", src),
+            Instr::PushImm(imm) => write!(f, "push {}", imm),
+            Instr::Pop(dst) => write!(f, "pop {}", dst),
 
-            Instruction::Add(dst, src) => write!(f, "add {}, {}", dst, src),
-            Instruction::AddImm(dst, imm) => write!(f, "add {}, {}", dst, imm),
-            Instruction::Sub(dst, src) => write!(f, "sub {}, {}", dst, src),
-            Instruction::SubImm(dst, imm) => write!(f, "sub {}, {}", dst, imm),
-            Instruction::Imul(dst, src) => write!(f, "imul {}, {}", dst, src),
-            Instruction::Idiv(src) => write!(f, "idiv {}", src),
+            Instr::Add(dst, src) => write!(f, "add {}, {}", dst, src),
+            Instr::AddImm(dst, imm) => write!(f, "add {}, {}", dst, imm),
+            Instr::Sub(dst, src) => write!(f, "sub {}, {}", dst, src),
+            Instr::SubImm(dst, imm) => write!(f, "sub {}, {}", dst, imm),
+            Instr::Imul(dst, src) => write!(f, "imul {}, {}", dst, src),
+            Instr::Idiv(src) => write!(f, "idiv {}", src),
 
-            Instruction::Cqo => write!(f, "cqo"),
-            Instruction::Ret => write!(f, "ret"),
+            Instr::Cqo => write!(f, "cqo"),
+            Instr::Ret => write!(f, "ret"),
         }
     }
 }
@@ -110,7 +110,7 @@ impl fmt::Display for Asm {
 
 enum AsmItem {
     Label(String),
-    Instr(Instruction),
+    Instr(Instr),
 }
 
 pub struct Builder {
@@ -124,7 +124,7 @@ impl Builder {
         }
     }
 
-    pub fn instr(&mut self, instr: Instruction) {
+    pub fn instr(&mut self, instr: Instr) {
         self.asm.items.push(AsmItem::Instr(instr));
     }
 
