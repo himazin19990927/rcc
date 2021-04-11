@@ -4,8 +4,13 @@
 name = "rcc"
 version = "0.1.0"
 dependencies = [
+ "rcc_codegen",
  "rcc_parser",
 ]
+
+[[package]]
+name = "rcc_codegen"
+version = "0.1.0"
 
 [[package]]
 name = "rcc_parser"
