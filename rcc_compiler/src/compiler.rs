@@ -40,7 +40,8 @@ impl Compiler {
                         self.builder.instr(Instr::Imul(Reg::RAX, Reg::RDI));
                     }
                     BinOp::Div => {
-                        unimplemented!()
+                        self.builder.instr(Instr::Cqo);
+                        self.builder.instr(Instr::Idiv(Reg::RDI));
                     }
                     BinOp::Eq => {
                         self.builder.instr(Instr::Cmp(Reg::RAX, Reg::RDI));
