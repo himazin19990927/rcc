@@ -4,6 +4,11 @@ pub enum BinOp {
     Sub,
     Mul,
     Div,
+
+    Eq,
+    Lt,
+    Le,
+    Ne,
 }
 
 #[derive(Debug, PartialEq)]

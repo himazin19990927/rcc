@@ -31,7 +31,6 @@ impl<'a> Parser<'a> {
         return false;
     }
 
-    #[allow(dead_code)]
     fn expect(&mut self, kind: TokenKind) {
         if self.cur.kind != kind {
             panic!("expect {:?}, but got {:?}", kind, self.cur.kind)
@@ -52,15 +51,61 @@ impl<'a> Parser<'a> {
     }
 
     pub fn expr(&mut self) -> Expr {
+        return self.equality();
+    }
+
+    pub fn equality(&mut self) -> Expr {
+        let left = self.relational();
+
+        if self.consume(TokenKind::EqEq) {
+            let right = self.relational();
+            return Expr::Binary(BinOp::Eq, Box::new(left), Box::new(right));
+        }
+
+        if self.consume(TokenKind::Ne) {
+            let right = self.relational();
+            return Expr::Binary(BinOp::Ne, Box::new(left), Box::new(right));
+        }
+
+        return left;
+    }
+
+    pub fn relational(&mut self) -> Expr {
+        let left = self.add();
+
+        if self.consume(TokenKind::Lt) {
+            let right = self.add();
+            return Expr::Binary(BinOp::Lt, Box::new(left), Box::new(right));
+        }
+
+        if self.consume(TokenKind::Le) {
+            let right = self.add();
+            return Expr::Binary(BinOp::Le, Box::new(left), Box::new(right));
+        }
+
+        if self.consume(TokenKind::Gt) {
+            let right = self.add();
+            return Expr::Binary(BinOp::Lt, Box::new(right), Box::new(left));
+        }
+
+        if self.consume(TokenKind::Ge) {
+            let right = self.add();
+            return Expr::Binary(BinOp::Le, Box::new(right), Box::new(left));
+        }
+
+        return left;
+    }
+
+    pub fn add(&mut self) -> Expr {
         let left = self.mul();
 
         if self.consume(TokenKind::Plus) {
-            let right = self.expr();
+            let right = self.add();
             return Expr::Binary(BinOp::Add, Box::new(left), Box::new(right));
         }
 
         if self.consume(TokenKind::Minus) {
-            let right = self.expr();
+            let right = self.add();
             return Expr::Binary(BinOp::Sub, Box::new(left), Box::new(right));
         }
 
@@ -248,6 +293,58 @@ mod tests {
                         Box::new(Expr::Integer(5)),
                     )),
                 )),
+            ),
+        );
+    }
+
+    #[test]
+    fn parse_relational() {
+        test_expr(
+            "1==2",
+            Expr::Binary(
+                BinOp::Eq,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1<2",
+            Expr::Binary(
+                BinOp::Lt,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1<=2",
+            Expr::Binary(
+                BinOp::Le,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1!=2",
+            Expr::Binary(
+                BinOp::Ne,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1>2",
+            Expr::Binary(
+                BinOp::Lt,
+                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Integer(1)),
+            ),
+        );
+        test_expr(
+            "1>=2",
+            Expr::Binary(
+                BinOp::Le,
+                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Integer(1)),
             ),
         );
     }

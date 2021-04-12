@@ -42,6 +42,7 @@ impl Compiler {
                     BinOp::Div => {
                         unimplemented!()
                     }
+                    _ => unimplemented!(),
                 }
 
                 self.builder.instr(Instr::Push(Reg::RAX));
