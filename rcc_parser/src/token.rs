@@ -1,5 +1,12 @@
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TokenKind {
+    Lt,
+    Le,
+    EqEq,
+    Ne,
+    Ge,
+    Gt,
+
     Num,
     Plus,
     Minus,

@@ -28,18 +28,51 @@ impl<'a> Lexer<'a> {
         }
 
         let token = match self.ch {
+            '<' => match self.peek_char() {
+                '=' => {
+                    self.read_char();
+                    Token::new(TokenKind::Le, "<=")
+                }
+                _ => Token::new(TokenKind::Lt, self.ch),
+            },
+
+            '=' => match self.peek_char() {
+                '=' => {
+                    self.read_char();
+                    Token::new(TokenKind::EqEq, "==")
+                }
+                _ => todo!("Lexical analysis of \"==\" is not implemented."),
+            },
+
+            '>' => match self.peek_char() {
+                '=' => {
+                    self.read_char();
+                    Token::new(TokenKind::Ge, ">=")
+                }
+                _ => Token::new(TokenKind::Gt, self.ch),
+            },
+
+            '!' => match self.peek_char() {
+                '=' => {
+                    self.read_char();
+                    Token::new(TokenKind::Ne, "!=")
+                }
+                _ => todo!("Lexical analysis of \"!\" is not implemented."),
+            },
+
             '+' => Token::new(TokenKind::Plus, self.ch),
             '-' => Token::new(TokenKind::Minus, self.ch),
             '*' => Token::new(TokenKind::Star, self.ch),
             '/' => Token::new(TokenKind::Slash, self.ch),
             '(' => Token::new(TokenKind::OpenParen, self.ch),
             ')' => Token::new(TokenKind::CloseParen, self.ch),
+
             c => {
                 if c.is_digit(10) {
                     return Token::new(TokenKind::Num, self.read_number().unwrap());
                 }
 
-                unimplemented!();
+                todo!("Lexical analysis of arbitrary characters that are not numbers is not implemented.")
             }
         };
 
@@ -172,6 +205,69 @@ mod tests {
                 Token::new(TokenKind::Plus, '+'),
                 Token::new(TokenKind::Num, "1"),
                 Token::new(TokenKind::CloseParen, ')'),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+    }
+
+    #[test]
+    fn tokenize_relational() {
+        test_lexer(
+            "1==2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::EqEq, "=="),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "1!=2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Ne, "!="),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "1<2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Lt, "<"),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "1<=2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Le, "<="),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "1>2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Gt, ">"),
+                Token::new(TokenKind::Num, "2"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "1>=2",
+            vec![
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Ge, ">="),
+                Token::new(TokenKind::Num, "2"),
                 Token::new(TokenKind::EOF, "\0"),
             ],
         );
