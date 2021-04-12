@@ -64,16 +64,4 @@ impl Compiler {
             }
         }
     }
-
-    // pub fn compile_binary(&mut self) {
-    //     unimplemented!()
-    // }
-
-    // pub fn compile_unary(&mut self) {
-    //     unimplemented!()
-    // }
-
-    // pub fn compile_integer(&mut self) {
-    //     unimplemented!()
-    // }
 }
