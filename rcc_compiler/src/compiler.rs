@@ -42,7 +42,26 @@ impl Compiler {
                     BinOp::Div => {
                         unimplemented!()
                     }
-                    _ => unimplemented!(),
+                    BinOp::Eq => {
+                        self.builder.instr(Instr::Cmp(Reg::RAX, Reg::RDI));
+                        self.builder.instr(Instr::Sete(Reg::Al));
+                        self.builder.instr(Instr::Movzb(Reg::RAX, Reg::Al));
+                    }
+                    BinOp::Lt => {
+                        self.builder.instr(Instr::Cmp(Reg::RAX, Reg::RDI));
+                        self.builder.instr(Instr::Setl(Reg::Al));
+                        self.builder.instr(Instr::Movzb(Reg::RAX, Reg::Al));
+                    }
+                    BinOp::Le => {
+                        self.builder.instr(Instr::Cmp(Reg::RAX, Reg::RDI));
+                        self.builder.instr(Instr::Setle(Reg::Al));
+                        self.builder.instr(Instr::Movzb(Reg::RAX, Reg::Al));
+                    }
+                    BinOp::Ne => {
+                        self.builder.instr(Instr::Cmp(Reg::RAX, Reg::RDI));
+                        self.builder.instr(Instr::Setne(Reg::Al));
+                        self.builder.instr(Instr::Movzb(Reg::RAX, Reg::Al));
+                    }
                 }
 
                 self.builder.instr(Instr::Push(Reg::RAX));

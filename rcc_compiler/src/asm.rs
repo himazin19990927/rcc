@@ -2,6 +2,7 @@ use std::fmt;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Reg {
+    // 64bit
     RAX,
     RDI,
     RSI,
@@ -18,6 +19,9 @@ pub enum Reg {
     R13,
     R14,
     R15,
+
+    // 8bit
+    Al,
 }
 
 impl fmt::Display for Reg {
@@ -39,6 +43,7 @@ impl fmt::Display for Reg {
             Reg::R13 => write!(f, "r13"),
             Reg::R14 => write!(f, "r14"),
             Reg::R15 => write!(f, "r15"),
+            Reg::Al => write!(f, "al"),
         }
     }
 }
@@ -53,14 +58,23 @@ pub enum Instr {
     PushImm(u32),
     Pop(Reg),
 
+    Cmp(Reg, Reg),
+    CmpImm(Reg, u32),
+
+    Sete(Reg),
+    Setne(Reg),
+    Setl(Reg),
+    Setle(Reg),
+
     Add(Reg, Reg),
     AddImm(Reg, u32),
     Sub(Reg, Reg),
     SubImm(Reg, u32),
     Imul(Reg, Reg),
     Idiv(Reg),
-
     Cqo,
+    Movzb(Reg, Reg),
+
     Ret,
 }
 
@@ -75,14 +89,23 @@ impl fmt::Display for Instr {
             Instr::PushImm(imm) => write!(f, "push {}", imm),
             Instr::Pop(dst) => write!(f, "pop {}", dst),
 
+            Instr::Cmp(reg1, reg2) => write!(f, "cmp {}, {}", reg1, reg2),
+            Instr::CmpImm(reg, imm) => write!(f, "cmp {}, {}", reg, imm),
+
+            Instr::Sete(reg) => write!(f, "sete {}", reg),
+            Instr::Setne(reg) => write!(f, "setne {}", reg),
+            Instr::Setl(reg) => write!(f, "setl {}", reg),
+            Instr::Setle(reg) => write!(f, "setle {}", reg),
+
             Instr::Add(dst, src) => write!(f, "add {}, {}", dst, src),
             Instr::AddImm(dst, imm) => write!(f, "add {}, {}", dst, imm),
             Instr::Sub(dst, src) => write!(f, "sub {}, {}", dst, src),
             Instr::SubImm(dst, imm) => write!(f, "sub {}, {}", dst, imm),
             Instr::Imul(dst, src) => write!(f, "imul {}, {}", dst, src),
             Instr::Idiv(src) => write!(f, "idiv {}", src),
-
             Instr::Cqo => write!(f, "cqo"),
+            Instr::Movzb(dst, src) => write!(f, "movzb {}, {}", dst, src),
+
             Instr::Ret => write!(f, "ret"),
         }
     }
