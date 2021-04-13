@@ -14,6 +14,11 @@ pub enum TokenKind {
     Slash,
     OpenParen,
     CloseParen,
+
+    Int,
+
+    Identifier,
+
     EOF,
     Unknown,
 }
