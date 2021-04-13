@@ -67,21 +67,17 @@ impl<'a> Lexer<'a> {
             '(' => Token::new(TokenKind::OpenParen, self.ch),
             ')' => Token::new(TokenKind::CloseParen, self.ch),
 
-            c => {
-                if c.is_digit(10) {
-                    return Token::new(TokenKind::Num, self.read_number().unwrap());
-                }
+            '0'..='9' => return Token::new(TokenKind::Num, self.read_number().unwrap()),
 
-                match self.read_str() {
-                    Some(word) => {
-                        return match word.as_str() {
-                            "int" => Token::new(TokenKind::Int, word),
-                            _ => Token::new(TokenKind::Identifier, word),
-                        }
+            _ => match self.read_str() {
+                Some(word) => {
+                    return match word.as_str() {
+                        "int" => Token::new(TokenKind::Int, word),
+                        _ => Token::new(TokenKind::Identifier, word),
                     }
-                    None => panic!("cannot tokenize"),
                 }
-            }
+                None => panic!("cannot tokenize"),
+            },
         };
 
         self.read_char();
