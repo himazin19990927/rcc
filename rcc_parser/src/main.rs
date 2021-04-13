@@ -1,5 +1,5 @@
 use rcc_parser::{lexer::Lexer, parser::Parser};
-use std::{env, iter::Peekable, str::Chars};
+use std::env;
 
 fn main() {
     // let mut chars = "int a".chars();

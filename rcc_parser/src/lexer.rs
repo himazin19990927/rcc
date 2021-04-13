@@ -72,7 +72,15 @@ impl<'a> Lexer<'a> {
                     return Token::new(TokenKind::Num, self.read_number().unwrap());
                 }
 
-                todo!("Lexical analysis of arbitrary characters that are not numbers is not implemented.")
+                match self.read_str() {
+                    Some(word) => {
+                        return match word.as_str() {
+                            "int" => Token::new(TokenKind::Int, word),
+                            _ => Token::new(TokenKind::Identifier, word),
+                        }
+                    }
+                    None => panic!("cannot tokenize"),
+                }
             }
         };
 
@@ -113,7 +121,27 @@ impl<'a> Lexer<'a> {
             }
         }
 
-        return Some(num_str);
+        Some(num_str)
+    }
+
+    pub fn read_str(&mut self) -> Option<String> {
+        let is_letter = |c: char| c.is_ascii_alphanumeric() || c == '_';
+
+        if self.terminated || !is_letter(self.ch) {
+            return None;
+        }
+
+        let mut word = String::from(self.ch);
+        loop {
+            let c = self.read_char();
+            if is_letter(c) {
+                word.push(c);
+            } else {
+                break;
+            }
+        }
+
+        Some(word)
     }
 
     pub fn peek_char(&self) -> char {
@@ -142,6 +170,15 @@ mod tests {
         assert_eq!(Some("100".to_string()), Lexer::new("100").read_number());
         assert_eq!(Some("1".to_string()), Lexer::new("1+1").read_number());
         assert_eq!(None, Lexer::new("a1").read_number());
+    }
+
+    #[test]
+    fn read_str() {
+        assert_eq!(Some("int".to_string()), Lexer::new("int a").read_str());
+        assert_eq!(
+            Some("return".to_string()),
+            Lexer::new("return 0").read_str()
+        );
     }
 
     fn test_lexer(src: &str, expected: Vec<Token>) {
@@ -271,5 +308,17 @@ mod tests {
                 Token::new(TokenKind::EOF, "\0"),
             ],
         );
+    }
+
+    #[test]
+    fn tokenize_str() {
+        test_lexer(
+            "int a",
+            vec![
+                Token::new(TokenKind::Int, "int"),
+                Token::new(TokenKind::Identifier, "a"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        )
     }
 }
