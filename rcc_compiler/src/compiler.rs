@@ -23,19 +23,7 @@ impl Compiler {
     pub fn compile_expr(&mut self, expr: &Expr) {
         match expr {
             Expr::Binary(op, lhs, rhs) => self.compile_expr_binary(*op, lhs, rhs),
-            Expr::Unary(op, rhs) => match op {
-                UnOp::Neg => {
-                    self.builder.instr(Instr::PushImm(0));
-                    self.compile_expr(rhs);
-
-                    self.builder.instr(Instr::Pop(Reg::RDI));
-                    self.builder.instr(Instr::Pop(Reg::RAX));
-
-                    self.builder.instr(Instr::Sub(Reg::RAX, Reg::RDI));
-
-                    self.builder.instr(Instr::Push(Reg::RAX));
-                }
-            },
+            Expr::Unary(op, rhs) => self.compile_expr_unary(*op, rhs),
             Expr::Integer(num) => {
                 self.builder.instr(Instr::PushImm(*num));
             }
@@ -88,5 +76,21 @@ impl Compiler {
         }
 
         self.builder.instr(Instr::Push(Reg::RAX));
+    }
+
+    pub fn compile_expr_unary(&mut self, op: UnOp, rhs: &Expr) {
+        match op {
+            UnOp::Neg => {
+                self.builder.instr(Instr::PushImm(0));
+                self.compile_expr(rhs);
+
+                self.builder.instr(Instr::Pop(Reg::RDI));
+                self.builder.instr(Instr::Pop(Reg::RAX));
+
+                self.builder.instr(Instr::Sub(Reg::RAX, Reg::RDI));
+
+                self.builder.instr(Instr::Push(Reg::RAX));
+            }
+        }
     }
 }
