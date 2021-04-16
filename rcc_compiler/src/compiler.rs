@@ -22,9 +22,9 @@ impl Compiler {
 
     pub fn compile_expr(&mut self, expr: &Expr) {
         match expr {
-            Expr::Binary(op, left, right) => {
-                self.compile_expr(left);
-                self.compile_expr(right);
+            Expr::Binary(op, lhs, rhs) => {
+                self.compile_expr(lhs);
+                self.compile_expr(rhs);
 
                 self.builder.instr(Instr::Pop(Reg::RDI));
                 self.builder.instr(Instr::Pop(Reg::RAX));
@@ -67,10 +67,10 @@ impl Compiler {
 
                 self.builder.instr(Instr::Push(Reg::RAX));
             }
-            Expr::Unary(op, right) => match op {
+            Expr::Unary(op, rhs) => match op {
                 UnOp::Neg => {
                     self.builder.instr(Instr::PushImm(0));
-                    self.compile_expr(right);
+                    self.compile_expr(rhs);
 
                     self.builder.instr(Instr::Pop(Reg::RDI));
                     self.builder.instr(Instr::Pop(Reg::RAX));
@@ -83,6 +83,8 @@ impl Compiler {
             Expr::Integer(num) => {
                 self.builder.instr(Instr::PushImm(*num));
             }
+            #[allow(unused_variables)]
+            Expr::Ident(ident) => unimplemented!(),
         }
     }
 }

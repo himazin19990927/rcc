@@ -1,3 +1,3 @@
-cargo run -- ""$1""
+cargo run -q -- ""$1""
 ./tmp
 echo "$?"

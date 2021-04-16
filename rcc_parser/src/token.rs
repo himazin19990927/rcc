@@ -7,6 +7,8 @@ pub enum TokenKind {
     Ge,
     Gt,
 
+    Eq,
+
     Num,
     Plus,
     Minus,
@@ -14,6 +16,7 @@ pub enum TokenKind {
     Slash,
     OpenParen,
     CloseParen,
+    Semi,
 
     Int,
 

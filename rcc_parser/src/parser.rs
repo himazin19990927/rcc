@@ -1,4 +1,6 @@
-use crate::ast::{BinOp, Expr, UnOp};
+use core::panic;
+
+use crate::ast::{BinOp, Expr, Stmt, UnOp};
 use crate::lexer::Lexer;
 use crate::token::{Token, TokenKind};
 
@@ -31,6 +33,10 @@ impl<'a> Parser<'a> {
         return false;
     }
 
+    fn peek_kind(&self) -> TokenKind {
+        self.cur.kind
+    }
+
     fn expect(&mut self, kind: TokenKind) {
         if self.cur.kind != kind {
             panic!("expect {:?}, but got {:?}", kind, self.cur.kind)
@@ -48,6 +54,47 @@ impl<'a> Parser<'a> {
         self.next_token();
 
         return num;
+    }
+
+    fn expect_ident(&mut self) -> String {
+        if self.cur.kind != TokenKind::Identifier {
+            panic!(
+                "expect {:?}, but got {:?}",
+                TokenKind::Identifier,
+                self.cur.kind
+            );
+        }
+
+        let ident = self.cur.literal.clone();
+        self.next_token();
+
+        return ident;
+    }
+
+    pub fn program(&mut self) -> Vec<Stmt> {
+        let mut program = Vec::new();
+        while self.peek_kind() != TokenKind::EOF {
+            program.push(self.stmt());
+        }
+
+        return program;
+    }
+
+    pub fn stmt(&mut self) -> Stmt {
+        if self.consume(TokenKind::Int) {
+            let ident = self.expect_ident();
+            self.expect(TokenKind::Eq);
+            let rhs = self.expr();
+            self.expect(TokenKind::Semi);
+
+            return Stmt::Declaration(Expr::Ident(ident), rhs);
+        }
+
+        let ident = self.expect_ident();
+        self.expect(TokenKind::Eq);
+        let rhs = self.expr();
+        self.expect(TokenKind::Semi);
+        return Stmt::Assign(Expr::Ident(ident), rhs);
     }
 
     pub fn expr(&mut self) -> Expr {
@@ -148,20 +195,43 @@ impl<'a> Parser<'a> {
             return expr;
         }
 
-        let num = self.expect_number();
-
-        Expr::Integer(num)
+        match self.peek_kind() {
+            TokenKind::Identifier => {
+                let ident = self.expect_ident();
+                Expr::Ident(ident)
+            }
+            TokenKind::Num => {
+                let num = self.expect_number();
+                Expr::Integer(num)
+            }
+            _ => panic!(
+                "Expected {:?} or {:?} but got {:?}",
+                TokenKind::Identifier,
+                TokenKind::Num,
+                self.peek_kind()
+            ),
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::{BinOp, Expr, UnOp};
+    use std::collections::vec_deque;
+
+    use crate::ast::{BinOp, Expr, Stmt, UnOp};
     use crate::lexer::Lexer;
     use crate::parser::Parser;
 
     fn test_expr(src: &str, expect: Expr) {
         assert_eq!(expect, Parser::new(Lexer::new(src)).expr());
+    }
+
+    fn test_stmt(src: &str, expect: Stmt) {
+        assert_eq!(expect, Parser::new(Lexer::new(src)).stmt());
+    }
+
+    fn test_program(src: &str, expect: Vec<Stmt>) {
+        assert_eq!(expect, Parser::new(Lexer::new(src)).program());
     }
 
     #[test]
@@ -347,5 +417,48 @@ mod tests {
                 Box::new(Expr::Integer(1)),
             ),
         );
+    }
+
+    #[test]
+    fn parse_ident() {
+        test_expr("val", Expr::Ident("val".to_string()));
+        test_expr(
+            "a+1",
+            Expr::Binary(
+                BinOp::Add,
+                Box::new(Expr::Ident("a".to_string())),
+                Box::new(Expr::Integer(1)),
+            ),
+        );
+    }
+
+    #[test]
+    fn parse_stmt() {
+        test_stmt(
+            "int a = 0;",
+            Stmt::Declaration(Expr::Ident("a".to_string()), Expr::Integer(0)),
+        );
+        test_stmt(
+            "a = 0;",
+            Stmt::Assign(Expr::Ident("a".to_string()), Expr::Integer(0)),
+        );
+    }
+
+    #[test]
+    fn parse_program() {
+        test_program(
+            "int a = 0; a = a + 1;",
+            vec![
+                Stmt::Declaration(Expr::Ident("a".to_string()), Expr::Integer(0)),
+                Stmt::Assign(
+                    Expr::Ident("a".to_string()),
+                    Expr::Binary(
+                        BinOp::Add,
+                        Box::new(Expr::Ident("a".to_string())),
+                        Box::new(Expr::Integer(1)),
+                    ),
+                ),
+            ],
+        )
     }
 }

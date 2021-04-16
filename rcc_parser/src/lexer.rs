@@ -41,7 +41,7 @@ impl<'a> Lexer<'a> {
                     self.read_char();
                     Token::new(TokenKind::EqEq, "==")
                 }
-                _ => todo!("Lexical analysis of \"==\" is not implemented."),
+                _ => Token::new(TokenKind::Eq, self.ch),
             },
 
             '>' => match self.peek_char() {
@@ -66,6 +66,7 @@ impl<'a> Lexer<'a> {
             '/' => Token::new(TokenKind::Slash, self.ch),
             '(' => Token::new(TokenKind::OpenParen, self.ch),
             ')' => Token::new(TokenKind::CloseParen, self.ch),
+            ';' => Token::new(TokenKind::Semi, self.ch),
 
             '0'..='9' => return Token::new(TokenKind::Num, self.read_number().unwrap()),
 
@@ -315,6 +316,52 @@ mod tests {
                 Token::new(TokenKind::Identifier, "a"),
                 Token::new(TokenKind::EOF, "\0"),
             ],
-        )
+        );
+
+        test_lexer(
+            "a = 1;",
+            vec![
+                Token::new(TokenKind::Identifier, "a"),
+                Token::new(TokenKind::Eq, "="),
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Semi, ";"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "val = 1;",
+            vec![
+                Token::new(TokenKind::Identifier, "val"),
+                Token::new(TokenKind::Eq, "="),
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Semi, ";"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "int a = 1;",
+            vec![
+                Token::new(TokenKind::Int, "int"),
+                Token::new(TokenKind::Identifier, "a"),
+                Token::new(TokenKind::Eq, "="),
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Semi, ";"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "int val = 1;",
+            vec![
+                Token::new(TokenKind::Int, "int"),
+                Token::new(TokenKind::Identifier, "val"),
+                Token::new(TokenKind::Eq, "="),
+                Token::new(TokenKind::Num, "1"),
+                Token::new(TokenKind::Semi, ";"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
     }
 }
