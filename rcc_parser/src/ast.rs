@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BinOp {
     Add,
     Sub,
@@ -11,7 +11,7 @@ pub enum BinOp {
     Ne,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum UnOp {
     Neg,
 }
