@@ -81,6 +81,13 @@ impl<'a> Parser<'a> {
     }
 
     pub fn stmt(&mut self) -> Stmt {
+        if self.consume(TokenKind::Return) {
+            let expr = self.expr();
+            self.expect(TokenKind::Semi);
+
+            return Stmt::Return(expr);
+        }
+
         if self.consume(TokenKind::Int) {
             let ident = self.expect_ident();
             self.expect(TokenKind::Eq);
@@ -439,6 +446,20 @@ mod tests {
         test_stmt(
             "a = 0;",
             Stmt::Assign(Expr::Ident("a".to_string()), Expr::Integer(0)),
+        );
+    }
+
+    #[test]
+    fn parse_return() {
+        test_stmt("return 0;", Stmt::Return(Expr::Integer(0)));
+        test_stmt("return a;", Stmt::Return(Expr::Ident("a".to_string())));
+        test_stmt(
+            "return a+1;",
+            Stmt::Return(Expr::Binary(
+                BinOp::Add,
+                Box::new(Expr::Ident("a".to_string())),
+                Box::new(Expr::Integer(1)),
+            )),
         );
     }
 

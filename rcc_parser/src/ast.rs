@@ -20,6 +20,7 @@ pub enum UnOp {
 pub enum Stmt {
     Declaration(Expr, Expr),
     Assign(Expr, Expr),
+    Return(Expr),
 }
 
 #[derive(Debug, PartialEq)]
