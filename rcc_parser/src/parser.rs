@@ -216,8 +216,6 @@ impl<'a> Parser<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::vec_deque;
-
     use crate::ast::{BinOp, Expr, Stmt, UnOp};
     use crate::lexer::Lexer;
     use crate::parser::Parser;

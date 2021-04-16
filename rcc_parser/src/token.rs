@@ -19,6 +19,7 @@ pub enum TokenKind {
     Semi,
 
     Int,
+    Return,
 
     Identifier,
 
