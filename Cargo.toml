@@ -11,3 +11,4 @@ rcc_parser = {path = "rcc_parser"}
 rcc_compiler = {path = "rcc_compiler"}
 
 clap = "2.33.3"
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", features = ["llvm11-0"] }

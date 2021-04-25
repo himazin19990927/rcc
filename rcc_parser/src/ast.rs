@@ -18,6 +18,7 @@ pub enum UnOp {
 
 #[derive(Debug, PartialEq)]
 pub enum Stmt {
+    Print(Expr),
     Declaration(Expr, Expr),
     Assign(Expr, Expr),
     Return(Expr),
@@ -27,6 +28,6 @@ pub enum Stmt {
 pub enum Expr {
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Integer(u32),
+    Integer(u64),
     Ident(String),
 }

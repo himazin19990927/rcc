@@ -75,6 +75,7 @@ impl<'a> Lexer<'a> {
                     return match word.as_str() {
                         "int" => Token::new(TokenKind::Int, word),
                         "return" => Token::new(TokenKind::Return, word),
+                        "print" => Token::new(TokenKind::Print, word),
                         _ => Token::new(TokenKind::Identifier, word),
                     }
                 }
@@ -370,6 +371,18 @@ mod tests {
             vec![
                 Token::new(TokenKind::Return, "return"),
                 Token::new(TokenKind::Num, "0"),
+                Token::new(TokenKind::Semi, ";"),
+                Token::new(TokenKind::EOF, "\0"),
+            ],
+        );
+
+        test_lexer(
+            "print(0);",
+            vec![
+                Token::new(TokenKind::Print, "print"),
+                Token::new(TokenKind::OpenParen, "("),
+                Token::new(TokenKind::Num, "0"),
+                Token::new(TokenKind::CloseParen, ")"),
                 Token::new(TokenKind::Semi, ";"),
                 Token::new(TokenKind::EOF, "\0"),
             ],

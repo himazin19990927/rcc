@@ -45,7 +45,7 @@ impl<'a> Parser<'a> {
         self.next_token();
     }
 
-    fn expect_number(&mut self) -> u32 {
+    fn expect_number(&mut self) -> u64 {
         if self.cur.kind != TokenKind::Num {
             panic!("expect {:?}, but got {:?}", TokenKind::Num, self.cur.kind);
         }
@@ -81,6 +81,15 @@ impl<'a> Parser<'a> {
     }
 
     pub fn stmt(&mut self) -> Stmt {
+        if self.consume(TokenKind::Print) {
+            self.expect(TokenKind::OpenParen);
+            let expr = self.expr();
+            self.expect(TokenKind::CloseParen);
+            self.expect(TokenKind::Semi);
+
+            return Stmt::Print(expr);
+        }
+
         if self.consume(TokenKind::Return) {
             let expr = self.expr();
             self.expect(TokenKind::Semi);
@@ -459,6 +468,19 @@ mod tests {
                 BinOp::Add,
                 Box::new(Expr::Ident("a".to_string())),
                 Box::new(Expr::Integer(1)),
+            )),
+        );
+    }
+
+    #[test]
+    fn parse_print() {
+        test_stmt("print(0);", Stmt::Print(Expr::Integer(0)));
+        test_stmt(
+            "print(1+2);",
+            Stmt::Print(Expr::Binary(
+                BinOp::Add,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
             )),
         );
     }

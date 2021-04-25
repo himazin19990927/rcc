@@ -20,6 +20,7 @@ pub enum TokenKind {
 
     Int,
     Return,
+    Print,
 
     Identifier,
 
