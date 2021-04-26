@@ -1,6 +1,14 @@
-use inkwell::{builder::Builder, context::Context, module::Module, values::IntValue, AddressSpace};
+use core::panic;
+use inkwell::{
+    builder::Builder,
+    context::Context,
+    module::Module,
+    values::{IntValue, PointerValue},
+    AddressSpace,
+};
 #[allow(unused_imports)]
 use rcc_parser::ast::{BinOp, Expr, Stmt, UnOp};
+use std::collections::HashMap;
 #[allow(unused_imports)]
 use std::{cell::Cell, path::Path, rc::Rc};
 
@@ -30,31 +38,54 @@ impl<'ctx> Compiler<'ctx> {
         }
     }
     pub fn build_program(&self, program: &Vec<Stmt>) {
+        let mut variables = HashMap::new();
+
         for stmt in program {
-            self.build_stmt(stmt);
+            self.build_stmt(stmt, &mut variables);
         }
     }
 
-    pub fn build_stmt(&self, stmt: &Stmt) {
+    pub fn build_stmt(&self, stmt: &Stmt, variables: &mut HashMap<String, PointerValue<'ctx>>) {
         match stmt {
             Stmt::Print(expr) => {
-                let value = self.build_expr(expr);
+                let value = self.build_expr(expr, variables);
                 self.build_printf_int(value);
             }
-            Stmt::Declaration(_, _) => unimplemented!("Stmt::Declaration"),
+            Stmt::Declaration(lhs, rhs) => {
+                if let Expr::Ident(ident) = lhs {
+                    self.bulid_declaration(ident.clone(), rhs, variables);
+                }
+            }
             Stmt::Assign(_, _) => unimplemented!("Stmt::Assign"),
             Stmt::Return(expr) => {
-                let value = self.build_expr(expr);
+                let value = self.build_expr(expr, variables);
                 self.builder.build_return(Some(&value));
             }
         }
     }
 
-    pub fn build_expr(&self, expr: &Expr) -> IntValue {
+    pub fn bulid_declaration(
+        &self,
+        name: String,
+        rhs: &Expr,
+        variables: &mut HashMap<String, PointerValue<'ctx>>,
+    ) {
+        let mem_ptr = self.builder.build_alloca(self.context.i32_type(), "local");
+        let rhs_value = self.build_expr(rhs, variables);
+        self.builder.build_store(mem_ptr, rhs_value);
+
+        variables.insert(name, mem_ptr);
+    }
+
+    pub fn build_expr(
+        &self,
+        expr: &Expr,
+        variables: &HashMap<String, PointerValue<'ctx>>,
+    ) -> IntValue {
         match expr {
             Expr::Binary(op, left, right) => {
-                let left_value = self.build_expr(left);
-                let right_value = self.build_expr(right);
+                let left_value = self.build_expr(left, variables);
+                let right_value = self.build_expr(right, variables);
 
                 match op {
                     BinOp::Add => self.builder.build_int_add(left_value, right_value, ""),
@@ -71,7 +102,13 @@ impl<'ctx> Compiler<'ctx> {
             }
             Expr::Unary(_, _) => unimplemented!(),
             Expr::Integer(value) => self.context.i32_type().const_int(*value, true),
-            Expr::Ident(_) => unimplemented!(),
+            Expr::Ident(ident) => match variables.get(ident) {
+                Some(ptr_value) => self
+                    .builder
+                    .build_load(ptr_value.clone(), "")
+                    .into_int_value(),
+                None => panic!("Cannot find value '{}' in this scope.", ident),
+            },
         }
     }
 
