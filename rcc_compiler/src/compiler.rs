@@ -111,6 +111,7 @@ impl<'ctx> Compiler<'ctx> {
                     .into_int_value(),
                 None => panic!("Cannot find value '{}' in this scope.", ident),
             },
+            Expr::Bool(_) => unimplemented!(),
         }
     }
 
