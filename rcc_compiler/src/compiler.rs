@@ -98,6 +98,8 @@ impl<'ctx> Compiler<'ctx> {
                     BinOp::Lt => unimplemented!(),
                     BinOp::Le => unimplemented!(),
                     BinOp::Ne => unimplemented!(),
+                    BinOp::And => unimplemented!(),
+                    BinOp::Or => unimplemented!(),
                 }
             }
             Expr::Unary(_, _) => unimplemented!(),

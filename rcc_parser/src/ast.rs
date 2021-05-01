@@ -1,14 +1,19 @@
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum BinOp {
-    Add,
-    Sub,
     Mul,
     Div,
 
-    Eq,
+    Add,
+    Sub,
+
     Lt,
     Le,
+
+    Eq,
     Ne,
+
+    And,
+    Or,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
