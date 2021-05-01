@@ -4,6 +4,16 @@ use crate::ast::*;
 grammar;
 
 pub Expr: Expr = {
+    Or,
+};
+
+Or: Expr = {
+    <lhs: Or> "||" < rhs: And> => Expr::Binary(BinOp::Or , Box::new(lhs), Box::new(rhs)),
+    And,
+};
+
+And: Expr = {
+    <lhs: And> "&&" < rhs: Equality> => Expr::Binary(BinOp::And , Box::new(lhs), Box::new(rhs)),
     Equality,
 };
 

@@ -42,35 +42,19 @@ mod tests {
     fn parse_binary() {
         test_expr(
             "1+2",
-            Expr::Binary(
-                BinOp::Add,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Add, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1-2",
-            Expr::Binary(
-                BinOp::Sub,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Sub, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1*2",
-            Expr::Binary(
-                BinOp::Mul,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Mul, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1/2",
-            Expr::Binary(
-                BinOp::Div,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Div, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1+2+3",
@@ -103,11 +87,7 @@ mod tests {
         test_expr("(1)", Expr::Int(1));
         test_expr(
             "(1+2)",
-            Expr::Binary(
-                BinOp::Add,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Add, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1*(2+3)",
@@ -147,50 +127,86 @@ mod tests {
     fn parse_relational() {
         test_expr(
             "1==2",
-            Expr::Binary(
-                BinOp::Eq,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Eq, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1<2",
-            Expr::Binary(
-                BinOp::Lt,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Lt, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1<=2",
-            Expr::Binary(
-                BinOp::Le,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Le, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1!=2",
-            Expr::Binary(
-                BinOp::Ne,
-                Box::new(Expr::Int(1)),
-                Box::new(Expr::Int(2)),
-            ),
+            Expr::Binary(BinOp::Ne, Box::new(Expr::Int(1)), Box::new(Expr::Int(2))),
         );
         test_expr(
             "1>2",
-            Expr::Binary(
-                BinOp::Lt,
-                Box::new(Expr::Int(2)),
-                Box::new(Expr::Int(1)),
-            ),
+            Expr::Binary(BinOp::Lt, Box::new(Expr::Int(2)), Box::new(Expr::Int(1))),
         );
         test_expr(
             "1>=2",
+            Expr::Binary(BinOp::Le, Box::new(Expr::Int(2)), Box::new(Expr::Int(1))),
+        );
+    }
+
+    #[test]
+    fn parse_logical_binary() {
+        test_expr(
+            "true&&false",
             Expr::Binary(
-                BinOp::Le,
-                Box::new(Expr::Int(2)),
-                Box::new(Expr::Int(1)),
+                BinOp::And,
+                Box::new(Expr::Bool(true)),
+                Box::new(Expr::Bool(false)),
+            ),
+        );
+
+        test_expr(
+            "true&&false&&true",
+            Expr::Binary(
+                BinOp::And,
+                Box::new(Expr::Binary(
+                    BinOp::And,
+                    Box::new(Expr::Bool(true)),
+                    Box::new(Expr::Bool(false)),
+                )),
+                Box::new(Expr::Bool(true)),
+            ),
+        );
+
+        test_expr(
+            "true||false",
+            Expr::Binary(
+                BinOp::Or,
+                Box::new(Expr::Bool(true)),
+                Box::new(Expr::Bool(false)),
+            ),
+        );
+
+        test_expr(
+            "true||false||true",
+            Expr::Binary(
+                BinOp::Or,
+                Box::new(Expr::Binary(
+                    BinOp::Or,
+                    Box::new(Expr::Bool(true)),
+                    Box::new(Expr::Bool(false)),
+                )),
+                Box::new(Expr::Bool(true)),
+            ),
+        );
+
+        test_expr(
+            "true||false&&true",
+            Expr::Binary(
+                BinOp::Or,
+                Box::new(Expr::Bool(true)),
+                Box::new(Expr::Binary(
+                    BinOp::And,
+                    Box::new(Expr::Bool(false)),
+                    Box::new(Expr::Bool(true)),
+                )),
             ),
         );
     }
