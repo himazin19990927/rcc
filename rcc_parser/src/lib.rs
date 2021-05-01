@@ -34,6 +34,12 @@ mod tests {
     }
 
     #[test]
+    fn parse_ident() {
+        test_expr("x", Expr::Ident("x".to_string()));
+        test_expr("hoge", Expr::Ident("hoge".to_string()));
+    }
+
+    #[test]
     fn parse_unary() {
         test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Int(1))));
     }
