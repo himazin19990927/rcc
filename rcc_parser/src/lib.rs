@@ -26,4 +26,9 @@ mod tests {
         test_expr("01", Expr::Integer(1));
         test_expr("(1)", Expr::Integer(1));
     }
+
+    #[test]
+    fn parse_unary() {
+        test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))));
+    }
 }

@@ -4,8 +4,13 @@ use crate::ast::*;
 grammar;
 
 pub Expr: Expr = {
-    Primary,
+    Unary,
 };
+
+Unary: Expr = {
+    "-" <p: Primary> => Expr::Unary(UnOp::Neg, Box::new(p)),
+    Primary,
+}
 
 Primary: Expr = {
     Integer => Expr::Integer(<>),
