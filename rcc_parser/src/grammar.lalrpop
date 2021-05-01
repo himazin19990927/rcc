@@ -4,6 +4,20 @@ use crate::ast::*;
 grammar;
 
 pub Expr: Expr = {
+    Equality,
+};
+
+Equality: Expr = {
+    <lhs: Relational> "==" < rhs: Relational> => Expr::Binary(BinOp::Eq , Box::new(lhs), Box::new(rhs)),
+    <lhs: Relational> "!=" < rhs: Relational> => Expr::Binary(BinOp::Ne , Box::new(lhs), Box::new(rhs)),
+    Relational,
+};
+
+Relational: Expr = {
+    <lhs: Add> "<" < rhs: Add> => Expr::Binary(BinOp::Lt , Box::new(lhs), Box::new(rhs)),
+    <lhs: Add> "<=" < rhs: Add> => Expr::Binary(BinOp::Le , Box::new(lhs), Box::new(rhs)),
+    <lhs: Add> ">" < rhs: Add> => Expr::Binary(BinOp::Lt , Box::new(rhs), Box::new(lhs)),
+    <lhs: Add> ">=" < rhs: Add> => Expr::Binary(BinOp::Le , Box::new(rhs), Box::new(lhs)),
     Add,
 };
 

@@ -136,4 +136,56 @@ mod tests {
             ),
         );
     }
+
+    #[test]
+    fn parse_relational() {
+        test_expr(
+            "1==2",
+            Expr::Binary(
+                BinOp::Eq,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1<2",
+            Expr::Binary(
+                BinOp::Lt,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1<=2",
+            Expr::Binary(
+                BinOp::Le,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1!=2",
+            Expr::Binary(
+                BinOp::Ne,
+                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Integer(2)),
+            ),
+        );
+        test_expr(
+            "1>2",
+            Expr::Binary(
+                BinOp::Lt,
+                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Integer(1)),
+            ),
+        );
+        test_expr(
+            "1>=2",
+            Expr::Binary(
+                BinOp::Le,
+                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Integer(1)),
+            ),
+        );
+    }
 }
