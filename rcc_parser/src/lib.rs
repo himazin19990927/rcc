@@ -42,6 +42,25 @@ mod tests {
     #[test]
     fn parse_unary() {
         test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Int(1))));
+        test_expr(
+            "&x",
+            Expr::Unary(UnOp::Ref, Box::new(Expr::Ident("x".to_string()))),
+        );
+
+        test_expr(
+            "*x",
+            Expr::Unary(UnOp::Deref, Box::new(Expr::Ident("x".to_string()))),
+        );
+        test_expr(
+            "**x",
+            Expr::Unary(
+                UnOp::Deref,
+                Box::new(Expr::Unary(
+                    UnOp::Deref,
+                    Box::new(Expr::Ident("x".to_string())),
+                )),
+            ),
+        );
     }
 
     #[test]

@@ -45,6 +45,8 @@ Mul: Expr = {
 
 Unary: Expr = {
     "-" <p: Primary> => Expr::Unary(UnOp::Neg, Box::new(p)),
+    "&" <u: Unary> => Expr::Unary(UnOp::Ref, Box::new(u)),
+    "*" <u: Unary> => Expr::Unary(UnOp::Deref, Box::new(u)),
     Primary,
 };
 
