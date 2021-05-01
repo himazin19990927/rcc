@@ -40,9 +40,15 @@ Unary: Expr = {
 
 Primary: Expr = {
     Int => Expr::Int(<>),
+    Bool => Expr::Bool(<>),
     "(" <Expr> ")",
 };
 
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };
+
+Bool: bool = {
+    r"true" => true,
+    r"false" => false,
+}

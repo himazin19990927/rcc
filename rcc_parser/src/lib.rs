@@ -28,6 +28,12 @@ mod tests {
     }
 
     #[test]
+    fn parse_bool() {
+        test_expr("true", Expr::Bool(true));
+        test_expr("false", Expr::Bool(false));
+    }
+
+    #[test]
     fn parse_unary() {
         test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Int(1))));
     }
