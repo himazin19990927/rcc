@@ -4,13 +4,25 @@ use crate::ast::*;
 grammar;
 
 pub Expr: Expr = {
+    Add,
+};
+
+Add: Expr = {
+    <lhs: Add> "+" < rhs: Mul> => Expr::Binary(BinOp::Add , Box::new(lhs), Box::new(rhs)),
+    <lhs: Add> "-" < rhs: Mul> => Expr::Binary(BinOp::Sub , Box::new(lhs), Box::new(rhs)),
+    Mul,
+};
+
+Mul: Expr = {
+    <lhs: Mul> "*" < rhs: Unary> => Expr::Binary(BinOp:: Mul, Box::new(lhs), Box::new(rhs)),
+    <lhs: Mul> "/" < rhs: Unary> => Expr::Binary(BinOp:: Div, Box::new(lhs), Box::new(rhs)),
     Unary,
 };
 
 Unary: Expr = {
     "-" <p: Primary> => Expr::Unary(UnOp::Neg, Box::new(p)),
     Primary,
-}
+};
 
 Primary: Expr = {
     Integer => Expr::Integer(<>),
