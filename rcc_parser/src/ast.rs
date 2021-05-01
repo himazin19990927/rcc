@@ -19,6 +19,8 @@ pub enum BinOp {
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum UnOp {
     Neg,
+    Ref,
+    Deref,
 }
 
 #[derive(Debug, PartialEq)]
