@@ -1,0 +1,17 @@
+use std::str::FromStr;
+use crate::ast::*;
+
+grammar;
+
+pub Expr: Expr = {
+    Primary,
+};
+
+Primary: Expr = {
+    Integer => Expr::Integer(<>),
+    "(" <Expr> ")",
+};
+
+Integer: u64 = {
+    r"[0-9]+" => u64::from_str(<>).unwrap(),
+};
