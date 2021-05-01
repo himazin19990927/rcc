@@ -59,6 +59,13 @@ Int: u64 = {
 };
 
 Bool: bool = {
-    r"true" => true,
-    r"false" => false,
+    TokTrue => true,
+    TokFalse => false,
+}
+
+match {
+    r"true" => TokTrue,
+    r"false" => TokFalse,
+} else {
+    _,
 }
