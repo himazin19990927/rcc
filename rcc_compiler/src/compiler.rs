@@ -103,7 +103,7 @@ impl<'ctx> Compiler<'ctx> {
                 }
             }
             Expr::Unary(_, _) => unimplemented!(),
-            Expr::Integer(value) => self.context.i32_type().const_int(*value, true),
+            Expr::Int(value) => self.context.i32_type().const_int(*value, true),
             Expr::Ident(ident) => match variables.get(ident) {
                 Some(ptr_value) => self
                     .builder

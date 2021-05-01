@@ -21,15 +21,15 @@ mod tests {
 
     #[test]
     fn parse_num() {
-        test_expr("0", Expr::Integer(0));
-        test_expr("10", Expr::Integer(10));
-        test_expr("01", Expr::Integer(1));
-        test_expr("(1)", Expr::Integer(1));
+        test_expr("0", Expr::Int(0));
+        test_expr("10", Expr::Int(10));
+        test_expr("01", Expr::Int(1));
+        test_expr("(1)", Expr::Int(1));
     }
 
     #[test]
     fn parse_unary() {
-        test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Integer(1))));
+        test_expr("-1", Expr::Unary(UnOp::Neg, Box::new(Expr::Int(1))));
     }
 
     #[test]
@@ -38,32 +38,32 @@ mod tests {
             "1+2",
             Expr::Binary(
                 BinOp::Add,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1-2",
             Expr::Binary(
                 BinOp::Sub,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1*2",
             Expr::Binary(
                 BinOp::Mul,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1/2",
             Expr::Binary(
                 BinOp::Div,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
@@ -72,10 +72,10 @@ mod tests {
                 BinOp::Add,
                 Box::new(Expr::Binary(
                     BinOp::Add,
-                    Box::new(Expr::Integer(1)),
-                    Box::new(Expr::Integer(2)),
+                    Box::new(Expr::Int(1)),
+                    Box::new(Expr::Int(2)),
                 )),
-                Box::new(Expr::Integer(3)),
+                Box::new(Expr::Int(3)),
             ),
         );
         test_expr(
@@ -84,34 +84,34 @@ mod tests {
                 BinOp::Add,
                 Box::new(Expr::Binary(
                     BinOp::Mul,
-                    Box::new(Expr::Integer(1)),
-                    Box::new(Expr::Integer(2)),
+                    Box::new(Expr::Int(1)),
+                    Box::new(Expr::Int(2)),
                 )),
-                Box::new(Expr::Integer(3)),
+                Box::new(Expr::Int(3)),
             ),
         );
     }
 
     #[test]
     fn parse_paren() {
-        test_expr("(1)", Expr::Integer(1));
+        test_expr("(1)", Expr::Int(1));
         test_expr(
             "(1+2)",
             Expr::Binary(
                 BinOp::Add,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1*(2+3)",
             Expr::Binary(
                 BinOp::Mul,
-                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Int(1)),
                 Box::new(Expr::Binary(
                     BinOp::Add,
-                    Box::new(Expr::Integer(2)),
-                    Box::new(Expr::Integer(3)),
+                    Box::new(Expr::Int(2)),
+                    Box::new(Expr::Int(3)),
                 )),
             ),
         );
@@ -121,16 +121,16 @@ mod tests {
                 BinOp::Mul,
                 Box::new(Expr::Binary(
                     BinOp::Add,
-                    Box::new(Expr::Integer(1)),
-                    Box::new(Expr::Integer(2)),
+                    Box::new(Expr::Int(1)),
+                    Box::new(Expr::Int(2)),
                 )),
                 Box::new(Expr::Binary(
                     BinOp::Div,
-                    Box::new(Expr::Integer(3)),
+                    Box::new(Expr::Int(3)),
                     Box::new(Expr::Binary(
                         BinOp::Add,
-                        Box::new(Expr::Integer(4)),
-                        Box::new(Expr::Integer(5)),
+                        Box::new(Expr::Int(4)),
+                        Box::new(Expr::Int(5)),
                     )),
                 )),
             ),
@@ -143,48 +143,48 @@ mod tests {
             "1==2",
             Expr::Binary(
                 BinOp::Eq,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1<2",
             Expr::Binary(
                 BinOp::Lt,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1<=2",
             Expr::Binary(
                 BinOp::Le,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1!=2",
             Expr::Binary(
                 BinOp::Ne,
-                Box::new(Expr::Integer(1)),
-                Box::new(Expr::Integer(2)),
+                Box::new(Expr::Int(1)),
+                Box::new(Expr::Int(2)),
             ),
         );
         test_expr(
             "1>2",
             Expr::Binary(
                 BinOp::Lt,
-                Box::new(Expr::Integer(2)),
-                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Int(2)),
+                Box::new(Expr::Int(1)),
             ),
         );
         test_expr(
             "1>=2",
             Expr::Binary(
                 BinOp::Le,
-                Box::new(Expr::Integer(2)),
-                Box::new(Expr::Integer(1)),
+                Box::new(Expr::Int(2)),
+                Box::new(Expr::Int(1)),
             ),
         );
     }

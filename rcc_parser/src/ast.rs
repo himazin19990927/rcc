@@ -33,7 +33,7 @@ pub enum Stmt {
 pub enum Expr {
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
-    Integer(u64),
+    Int(u64),
     Bool(bool),
     Ident(String),
 }

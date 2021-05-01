@@ -39,10 +39,10 @@ Unary: Expr = {
 };
 
 Primary: Expr = {
-    Integer => Expr::Integer(<>),
+    Int => Expr::Int(<>),
     "(" <Expr> ")",
 };
 
-Integer: u64 = {
+Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };
