@@ -36,6 +36,12 @@ pub enum Declarator {
     Pointer(Box<Declarator>),
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct Declaration {
+    type_specifier: TypeSpecifier,
+    declarator: Declarator,
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Stmt {
     Print(Expr),
