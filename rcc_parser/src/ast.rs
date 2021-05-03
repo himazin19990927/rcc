@@ -38,8 +38,8 @@ pub enum Declarator {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Declaration {
-    type_specifier: TypeSpecifier,
-    declarator: Declarator,
+    pub type_specifier: TypeSpecifier,
+    pub declarator: Declarator,
 }
 
 #[derive(Debug, PartialEq)]

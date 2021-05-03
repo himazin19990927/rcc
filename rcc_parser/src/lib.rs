@@ -12,11 +12,16 @@ pub fn parse_expr(input: &str) -> Expr {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_expr;
+    use super::{grammar, parse_expr};
     use crate::ast::*;
 
     fn test_expr(src: &str, expect: Expr) {
         assert_eq!(expect, parse_expr(src));
+    }
+
+    fn test_declaration(src: &str, expect: Declaration) {
+        let parser = grammar::DeclarationParser::new();
+        assert_eq!(expect, parser.parse(src).unwrap());
     }
 
     #[test]
@@ -233,6 +238,43 @@ mod tests {
                     Box::new(Expr::Bool(true)),
                 )),
             ),
+        );
+    }
+
+    #[test]
+    fn parse_declaration() {
+        test_declaration(
+            "int a",
+            Declaration {
+                type_specifier: TypeSpecifier::Int,
+                declarator: Declarator::Ident("a".to_string()),
+            },
+        );
+
+        test_declaration(
+            "char a",
+            Declaration {
+                type_specifier: TypeSpecifier::Char,
+                declarator: Declarator::Ident("a".to_string()),
+            },
+        );
+
+        test_declaration(
+            "int *a",
+            Declaration {
+                type_specifier: TypeSpecifier::Int,
+                declarator: Declarator::Pointer(Box::new(Declarator::Ident("a".to_string()))),
+            },
+        );
+
+        test_declaration(
+            "int **a",
+            Declaration {
+                type_specifier: TypeSpecifier::Int,
+                declarator: Declarator::Pointer(Box::new(Declarator::Pointer(Box::new(
+                    Declarator::Ident("a".to_string()),
+                )))),
+            },
         );
     }
 }

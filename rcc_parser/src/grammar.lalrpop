@@ -67,7 +67,11 @@ TypeSpecifier: TypeSpecifier = {
 
 Declarator: Declarator = {
     Ident => Declarator::Ident(<>),
-    "*" Declarator => Declarator::Pointer(Box::new(<>)),
+    "*" <d: Declarator> => Declarator::Pointer(Box::new(<>)),
+};
+
+pub Declaration: Declaration = {
+    <t: TypeSpecifier> <d: Declarator> => Declaration {type_specifier: t, declarator: d},
 };
 
 Int: u64 = {
