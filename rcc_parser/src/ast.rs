@@ -30,6 +30,7 @@ pub enum TypeSpecifier {
     Int,
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub enum Declarator {
     Ident(String),
     Pointer(Box<Declarator>),
