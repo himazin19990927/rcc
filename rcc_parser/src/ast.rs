@@ -53,7 +53,7 @@ pub struct Function {
 #[derive(Debug, PartialEq, Clone)]
 pub enum Stmt {
     Print(Expr),
-    Declaration(Expr, Expr),
+    Declaration(Declaration),
     Assign(Expr, Expr),
     Return(Expr),
 }
