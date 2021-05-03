@@ -72,7 +72,13 @@ Declarator: Declarator = {
 
 pub Declaration: Declaration = {
     <t: TypeSpecifier> <d: Declarator> => Declaration {type_specifier: t, declarator: d},
-};
+}; 
+
+pub Stmt: Stmt = {
+    <d: Declaration> ";" => Stmt::Declaration(d),
+    <lhs: Expr> "=" <rhs: Expr> ";" => Stmt::Assign(lhs, rhs),
+    TokReturn <e: Expr> ";" => Stmt::Return(e),
+}
 
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
@@ -94,6 +100,8 @@ match {
     r"void" => TokVoid,
     r"char" => TokChar,
     r"int" => TokInt,
+
+    r"return" => TokReturn,
 } else {
     _,
 }
