@@ -42,7 +42,15 @@ pub struct Declaration {
     pub declarator: Declarator,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
+pub struct Function {
+    name: String,
+    ret_type: Stmt,
+    args: Vec<Declaration>,
+    stmts: Vec<Stmt>,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum Stmt {
     Print(Expr),
     Declaration(Expr, Expr),
@@ -50,7 +58,7 @@ pub enum Stmt {
     Return(Expr),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Expr {
     Binary(BinOp, Box<Expr>, Box<Expr>),
     Unary(UnOp, Box<Expr>),
