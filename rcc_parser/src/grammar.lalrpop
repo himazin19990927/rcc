@@ -64,6 +64,12 @@ TypeSpecifier: TypeSpecifier = {
     TokInt => TypeSpecifier::Int,
 }
 
+
+Declarator: Declarator = {
+    Ident => Declarator::Ident(<>),
+    "*" Declarator => Declarator::Pointer(Box::new(<>)),
+};
+
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };
