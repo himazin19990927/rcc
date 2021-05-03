@@ -30,6 +30,11 @@ pub enum TypeSpecifier {
     Int,
 }
 
+pub enum Declarator {
+    Ident(String),
+    Pointer(Box<Declarator>),
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Stmt {
     Print(Expr),
