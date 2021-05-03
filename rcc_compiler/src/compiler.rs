@@ -51,11 +51,7 @@ impl<'ctx> Compiler<'ctx> {
                 let value = self.build_expr(expr, variables);
                 self.build_printf_int(value);
             }
-            Stmt::Declaration(lhs, rhs) => {
-                if let Expr::Ident(ident) = lhs {
-                    self.bulid_declaration(ident.clone(), rhs, variables);
-                }
-            }
+            Stmt::Declaration(_) => unimplemented!(),
             Stmt::Assign(_, _) => unimplemented!("Stmt::Assign"),
             Stmt::Return(expr) => {
                 let value = self.build_expr(expr, variables);
