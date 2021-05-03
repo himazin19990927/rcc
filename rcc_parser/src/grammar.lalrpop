@@ -62,7 +62,7 @@ TypeSpecifier: TypeSpecifier = {
     TokVoid => TypeSpecifier::Void,
     TokChar => TypeSpecifier::Char,
     TokInt => TypeSpecifier::Int,
-}
+};
 
 
 Declarator: Declarator = {
@@ -77,11 +77,11 @@ Int: u64 = {
 Bool: bool = {
     TokTrue => true,
     TokFalse => false,
-}
+};
 
 Ident: String = {
     r"[a-zA-Z][a-zA-Z0-9]*" => <>.to_string(),
-}
+};
 
 match {
     r"true" => TokTrue,
