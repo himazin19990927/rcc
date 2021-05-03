@@ -57,6 +57,13 @@ Primary: Expr = {
     "(" <Expr> ")",
 };
 
+
+TypeSpecifier: TypeSpecifier = {
+    TokVoid => TypeSpecifier::Void,
+    TokChar => TypeSpecifier::Char,
+    TokInt => TypeSpecifier::Int,
+}
+
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };
@@ -73,6 +80,10 @@ Ident: String = {
 match {
     r"true" => TokTrue,
     r"false" => TokFalse,
+
+    r"void" => TokVoid,
+    r"char" => TokChar,
+    r"int" => TokInt,
 } else {
     _,
 }
