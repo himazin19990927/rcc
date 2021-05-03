@@ -29,6 +29,11 @@ mod tests {
         assert_eq!(expect, parser.parse(src).unwrap());
     }
 
+    fn test_block_stmt(src: &str, expect: Vec<Stmt>) {
+        let parser = grammar::BlockStmtParser::new();
+        assert_eq!(expect, parser.parse(src).unwrap());
+    }
+
     #[test]
     fn parse_num() {
         test_expr("0", Expr::Int(0));
@@ -286,7 +291,7 @@ mod tests {
     #[test]
     fn parse_stmt() {
         test_stmt(
-            "int a;",
+            "int a",
             Stmt::Declaration(Declaration {
                 type_specifier: TypeSpecifier::Int,
                 declarator: Declarator::Ident("a".to_string()),
@@ -294,10 +299,32 @@ mod tests {
         );
 
         test_stmt(
-            "a = 0;",
+            "a = 0",
             Stmt::Assign(Expr::Ident("a".to_string()), Expr::Int(0)),
         );
 
-        test_stmt("return 0;", Stmt::Return(Expr::Int(0)));
+        test_stmt("return 0", Stmt::Return(Expr::Int(0)));
+    }
+
+    #[test]
+    fn parse_block_stmt() {
+        test_block_stmt(
+            "{int a;}",
+            vec![Stmt::Declaration(Declaration {
+                type_specifier: TypeSpecifier::Int,
+                declarator: Declarator::Ident("a".to_string()),
+            })],
+        );
+
+        test_block_stmt(
+            "{int a; a = 0;}",
+            vec![
+                Stmt::Declaration(Declaration {
+                    type_specifier: TypeSpecifier::Int,
+                    declarator: Declarator::Ident("a".to_string()),
+                }),
+                Stmt::Assign(Expr::Ident("a".to_string()), Expr::Int(0)),
+            ],
+        );
     }
 }

@@ -75,10 +75,24 @@ pub Declaration: Declaration = {
 }; 
 
 pub Stmt: Stmt = {
-    <d: Declaration> ";" => Stmt::Declaration(d),
-    <lhs: Expr> "=" <rhs: Expr> ";" => Stmt::Assign(lhs, rhs),
-    TokReturn <e: Expr> ";" => Stmt::Return(e),
+    <d: Declaration> => Stmt::Declaration(d),
+    <lhs: Expr> "=" <rhs: Expr> => Stmt::Assign(lhs, rhs),
+    TokReturn <e: Expr>  => Stmt::Return(e),
 }
+
+pub BlockStmt: Vec<Stmt> = {
+    "{" <stmts: Semi<Stmt>> "}" => stmts,
+}
+
+Semi<T>: Vec<T> = {
+    <mut v:(<T> ";")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            v.push(e);
+            v
+        }
+    }
+};
 
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
