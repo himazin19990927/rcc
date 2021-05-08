@@ -300,6 +300,8 @@ mod tests {
 
     #[test]
     fn parse_stmt() {
+        test_stmt("print(0)", Stmt::Print(Expr::Int(0)));
+
         test_stmt(
             "int a",
             Stmt::Declaration(Declaration {

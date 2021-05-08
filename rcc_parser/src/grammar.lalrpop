@@ -75,6 +75,7 @@ pub Declaration: Declaration = {
 }; 
 
 pub Stmt: Stmt = {
+    TokPrint "(" <e: Expr> ")" => Stmt::Print(e),
     <d: Declaration> => Stmt::Declaration(d),
     <lhs: Expr> "=" <rhs: Expr> => Stmt::Assign(lhs, rhs),
     TokReturn <e: Expr>  => Stmt::Return(e),
@@ -129,6 +130,7 @@ match {
     r"int" => TokInt,
 
     r"return" => TokReturn,
+    r"print" => TokPrint,
 } else {
     _,
 }
