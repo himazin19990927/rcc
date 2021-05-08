@@ -39,6 +39,11 @@ mod tests {
         assert_eq!(expect, parser.parse(src).unwrap());
     }
 
+    fn test_function(src: &str, expect: Function) {
+        let parser = grammar::FunctionParser::new();
+        assert_eq!(expect, parser.parse(src).unwrap());
+    }
+
     #[test]
     fn parse_num() {
         test_expr("0", Expr::Int(0));
@@ -373,6 +378,63 @@ mod tests {
                     )))),
                 },
             ],
+        );
+    }
+
+    #[test]
+    fn parse_function() {
+        test_function(
+            "int main(int argc, char **argv) {return 0;}",
+            Function {
+                name: "main".to_string(),
+                ret_type: TypeSpecifier::Int,
+                args: vec![
+                    Declaration {
+                        type_specifier: TypeSpecifier::Int,
+                        declarator: Declarator::Ident("argc".to_string()),
+                    },
+                    Declaration {
+                        type_specifier: TypeSpecifier::Char,
+                        declarator: Declarator::Pointer(Box::new(Declarator::Pointer(Box::new(
+                            Declarator::Ident("argv".to_string()),
+                        )))),
+                    },
+                ],
+                stmts: vec![Stmt::Return(Expr::Int(0))],
+            },
+        );
+
+        test_function(
+            "int add(int a, int b) {int c; c = a + b; return c;}",
+            Function {
+                name: "add".to_string(),
+                ret_type: TypeSpecifier::Int,
+                args: vec![
+                    Declaration {
+                        type_specifier: TypeSpecifier::Int,
+                        declarator: Declarator::Ident("a".to_string()),
+                    },
+                    Declaration {
+                        type_specifier: TypeSpecifier::Int,
+                        declarator: Declarator::Ident("b".to_string()),
+                    },
+                ],
+                stmts: vec![
+                    Stmt::Declaration(Declaration {
+                        type_specifier: TypeSpecifier::Int,
+                        declarator: Declarator::Ident("c".to_string()),
+                    }),
+                    Stmt::Assign(
+                        Expr::Ident("c".to_string()),
+                        Expr::Binary(
+                            BinOp::Add,
+                            Box::new(Expr::Ident("a".to_string())),
+                            Box::new(Expr::Ident("b".to_string())),
+                        ),
+                    ),
+                    Stmt::Return(Expr::Ident("c".to_string())),
+                ],
+            },
         );
     }
 }

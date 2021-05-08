@@ -98,6 +98,15 @@ Comma<T>: Vec<T> = {
     }
 };
 
+pub Function: Function = {
+    <t: TypeSpecifier> <name: Ident> <args: Args> <b: BlockStmt> => Function {
+        name: name,
+        ret_type: t,
+        args: args,
+        stmts: b,
+    },
+}
+
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };

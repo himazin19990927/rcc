@@ -44,10 +44,10 @@ pub struct Declaration {
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Function {
-    name: String,
-    ret_type: Stmt,
-    args: Vec<Declaration>,
-    stmts: Vec<Stmt>,
+    pub name: String,
+    pub ret_type: TypeSpecifier,
+    pub args: Vec<Declaration>,
+    pub stmts: Vec<Stmt>,
 }
 
 #[derive(Debug, PartialEq, Clone)]
