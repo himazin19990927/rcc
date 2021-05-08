@@ -78,11 +78,11 @@ pub Stmt: Stmt = {
     <d: Declaration> => Stmt::Declaration(d),
     <lhs: Expr> "=" <rhs: Expr> => Stmt::Assign(lhs, rhs),
     TokReturn <e: Expr>  => Stmt::Return(e),
-}
+};
 
 pub BlockStmt: Vec<Stmt> = {
     "{" <stmts:(<Stmt> ";")*> "}" => stmts,
-}
+};
 
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
