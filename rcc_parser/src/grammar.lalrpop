@@ -84,6 +84,20 @@ pub BlockStmt: Vec<Stmt> = {
     "{" <stmts:(<Stmt> ";")*> "}" => stmts,
 };
 
+pub Args: Vec<Declaration> = {
+    "(" <ds: Comma<Declaration>> ")" => ds,
+};
+
+Comma<T>: Vec<T> = {
+    <mut v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            v.push(e);
+            v
+        }
+    }
+};
+
 Int: u64 = {
     r"[0-9]+" => u64::from_str(<>).unwrap(),
 };

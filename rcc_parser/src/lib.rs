@@ -34,6 +34,11 @@ mod tests {
         assert_eq!(expect, parser.parse(src).unwrap());
     }
 
+    fn test_args(src: &str, expect: Vec<Declaration>) {
+        let parser = grammar::ArgsParser::new();
+        assert_eq!(expect, parser.parse(src).unwrap());
+    }
+
     #[test]
     fn parse_num() {
         test_expr("0", Expr::Int(0));
@@ -324,6 +329,49 @@ mod tests {
                     declarator: Declarator::Ident("a".to_string()),
                 }),
                 Stmt::Assign(Expr::Ident("a".to_string()), Expr::Int(0)),
+            ],
+        );
+    }
+
+    #[test]
+    fn parse_args() {
+        test_args("()", vec![]);
+
+        test_args(
+            "(int a)",
+            vec![Declaration {
+                type_specifier: TypeSpecifier::Int,
+                declarator: Declarator::Ident("a".to_string()),
+            }],
+        );
+
+        test_args(
+            "(int a, char b)",
+            vec![
+                Declaration {
+                    type_specifier: TypeSpecifier::Int,
+                    declarator: Declarator::Ident("a".to_string()),
+                },
+                Declaration {
+                    type_specifier: TypeSpecifier::Char,
+                    declarator: Declarator::Ident("b".to_string()),
+                },
+            ],
+        );
+
+        test_args(
+            "(int argc, char **argv)",
+            vec![
+                Declaration {
+                    type_specifier: TypeSpecifier::Int,
+                    declarator: Declarator::Ident("argc".to_string()),
+                },
+                Declaration {
+                    type_specifier: TypeSpecifier::Char,
+                    declarator: Declarator::Pointer(Box::new(Declarator::Pointer(Box::new(
+                        Declarator::Ident("argv".to_string()),
+                    )))),
+                },
             ],
         );
     }
